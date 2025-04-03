@@ -1,0 +1,32 @@
+server:
+  port: 8081
+spring:
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/chat-ebook
+    username: postgres
+    password: duchuy
+    hikari:
+      max-lifetime: 60000
+      auto-commit: false
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  thymeleaf:
+    mode: HTML
+  liquibase:
+    enabled: true
+auth:
+  tokenSecret: 41c9425ac8d185985f513ac833b94d8def071f69a27b2c1e4e9921e805bed586
+  tokenExpirationMsec: 7200000
+  refreshTokenSecret: 29110aaf4cb5050c89059c886aa5fa68c97738076721bc6b9f657eb31e0befc5
+  refreshTokenExpirationMsec: 2592000000
+springdoc:
+  swagger-ui:
+    path: /api/index.html
