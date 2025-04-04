@@ -29,13 +29,7 @@ public class User extends AbstractEntity {
   @Enumerated(EnumType.STRING)
   private Role role;
 
-  @Column private UUID confirmationToken;
-
   @Column private Timestamp confirmedAt;
-
-  @Column private UUID resetPasswordToken;
-
-  @Column private Timestamp resetPasswordSentAt;
 
   @Column(nullable = false)
   private Boolean isConfirmed = false;
