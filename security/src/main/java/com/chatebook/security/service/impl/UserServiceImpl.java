@@ -1,11 +1,12 @@
 package com.chatebook.security.service.impl;
 
-import com.chatebook.common.constant.CommonConstant;
+import com.chatebook.common.common.CommonFunction;
 import com.chatebook.common.constant.MessageConstant;
 import com.chatebook.common.exception.BadRequestException;
 import com.chatebook.common.exception.NotFoundException;
 import com.chatebook.common.model.enums.Role;
 import com.chatebook.security.model.User;
+import com.chatebook.security.payload.request.SignUpRequest;
 import com.chatebook.security.repository.UserRepository;
 import com.chatebook.security.service.UserService;
 import java.util.UUID;
@@ -22,13 +23,18 @@ public class UserServiceImpl implements UserService {
   private final PasswordEncoder passwordEncoder;
 
   @Override
-  public User createUser(String email, String password, String passwordConfirmation, String role) {
-    this.checkValidCreateUser(password, passwordConfirmation, email);
+  public User signUp(SignUpRequest signUpRequest) {
+    this.checkValidCreateUser(
+        signUpRequest.getPassword(),
+        signUpRequest.getConfirmationPassword(),
+        signUpRequest.getEmail());
 
     User user = new User();
-    user.setEmail(email.toLowerCase());
-    user.setPassword(passwordEncoder.encode(password));
-    user.setRole(Role.valueOf(CommonConstant.ROLE_PREFIX.concat(role)));
+    user.setEmail(signUpRequest.getEmail().toLowerCase());
+    user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+    user.setIsConfirmed(true);
+    user.setConfirmedAt(CommonFunction.getCurrentDateTime());
+    user.setRole(Role.ROLE_USER);
 
     return userRepository.save(user);
   }

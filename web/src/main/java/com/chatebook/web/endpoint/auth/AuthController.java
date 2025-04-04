@@ -8,6 +8,8 @@ import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.security.model.UserPrincipal;
 import com.chatebook.security.payload.request.RefreshTokenRequest;
 import com.chatebook.security.payload.request.SignInRequest;
+import com.chatebook.security.payload.request.SignUpRequest;
+import com.chatebook.security.service.UserService;
 import com.chatebook.security.token.TokenProvider;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -23,15 +25,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
-@Tag(name = "Alert APIs")
+@RequestMapping("/api/v1/auth")
+@Tag(name = "Auth APIs")
 public class AuthController {
 
   private final TokenProvider tokenProvider;
 
+  private final UserService userService;
+
   private final AuthenticationManager authenticationManager;
 
-  @PostMapping("/auth/sign-in")
+  @PostMapping("/sign-in")
   public ResponseEntity<ResponseDataAPI> signIn(@RequestBody @Valid SignInRequest signInRequest) {
     try {
       Authentication authentication =
@@ -52,7 +56,13 @@ public class AuthController {
     }
   }
 
-  @PostMapping("/auth/refresh-token")
+  @PostMapping("/sign-up")
+  public ResponseEntity<ResponseDataAPI> signUp(@RequestBody @Valid SignUpRequest signUpRequest) {
+    return ResponseEntity.ok(
+        ResponseDataAPI.successWithoutMeta(userService.signUp(signUpRequest)));
+  }
+
+  @PostMapping("/refresh-token")
   public ResponseEntity<ResponseDataAPI> refreshToken(
       @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
     return ResponseEntity.ok(
