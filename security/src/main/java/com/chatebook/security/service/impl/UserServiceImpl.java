@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public User signUp(SignUpRequest signUpRequest) {
-    this.checkValidCreateUser(
+    this.checkValidSignUp(
         signUpRequest.getPassword(),
         signUpRequest.getConfirmationPassword(),
         signUpRequest.getEmail());
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
     return userRepository.save(user);
   }
 
-  private void checkValidCreateUser(String password, String passwordConfirmation, String email) {
+  private void checkValidSignUp(String password, String passwordConfirmation, String email) {
     if (userRepository.existsByEmail(email.toLowerCase())) {
       throw new BadRequestException(MessageConstant.EMAIL_ALREADY_IN_USE);
     }
