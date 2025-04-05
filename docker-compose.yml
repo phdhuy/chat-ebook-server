@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres-chat-ebook
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: chat-ebook
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: duchuy
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - chat-ebook-network
+
+  rabbitmq:
+    image: "rabbitmq:management"
+    container_name: rabbitmq-chat-ebook
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq/data
+    networks:
+      - chat-ebook-network
+
+  redis:
+    image: redis:latest
+    container_name: redis-chat-ebook
+    hostname: redis
+    ports:
+      - "6380:6379"
+    networks:
+      - chat-ebook-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-app-chat-ebook
+    links:
+      - postgres
+      - rabbitmq
+      - redis
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/chat-ebook
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: duchuy
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+      - rabbitmq
+      - redis
+    networks:
+      - chat-ebook-network
+
+volumes:
+  postgres-data:
+  rabbitmq-data:
+
+networks:
+  chat-ebook-network:
+    driver: bridge
