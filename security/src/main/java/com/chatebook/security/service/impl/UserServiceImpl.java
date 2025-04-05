@@ -5,8 +5,10 @@ import com.chatebook.common.constant.MessageConstant;
 import com.chatebook.common.exception.BadRequestException;
 import com.chatebook.common.exception.NotFoundException;
 import com.chatebook.common.model.enums.Role;
+import com.chatebook.security.mapper.UserMapper;
 import com.chatebook.security.model.User;
 import com.chatebook.security.payload.request.SignUpRequest;
+import com.chatebook.security.payload.response.UserInfoResponse;
 import com.chatebook.security.repository.UserRepository;
 import com.chatebook.security.service.UserService;
 import java.util.UUID;
@@ -22,8 +24,10 @@ public class UserServiceImpl implements UserService {
 
   private final PasswordEncoder passwordEncoder;
 
+  private final UserMapper userMapper;
+
   @Override
-  public User signUp(SignUpRequest signUpRequest) {
+  public UserInfoResponse signUp(SignUpRequest signUpRequest) {
     this.checkValidSignUp(
         signUpRequest.getPassword(),
         signUpRequest.getConfirmationPassword(),
@@ -36,7 +40,7 @@ public class UserServiceImpl implements UserService {
     user.setConfirmedAt(CommonFunction.getCurrentDateTime());
     user.setRole(Role.ROLE_USER);
 
-    return userRepository.save(user);
+    return userMapper.toUserInfoResponse(userRepository.save(user));
   }
 
   private void checkValidSignUp(String password, String passwordConfirmation, String email) {

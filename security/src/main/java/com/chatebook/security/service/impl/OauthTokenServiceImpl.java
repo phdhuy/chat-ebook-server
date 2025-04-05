@@ -55,7 +55,10 @@ public class OauthTokenServiceImpl implements OauthTokenService {
   }
 
   @Override
-  public void revoke(OauthToken oauthToken) {}
+  public void revoke(OauthToken oauthToken) {
+    oauthToken.setRevokedAt(CommonFunction.getCurrentDateTime());
+    oauthTokenRepository.save(oauthToken);
+  }
 
   @Override
   public void revokeAll(OauthToken oauthToken, String email) {}

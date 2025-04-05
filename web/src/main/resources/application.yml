@@ -11,7 +11,7 @@ spring:
       max-lifetime: 60000
       auto-commit: false
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: none
   data:
