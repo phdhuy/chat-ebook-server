@@ -58,8 +58,7 @@ public class AuthController {
 
   @PostMapping("/sign-up")
   public ResponseEntity<ResponseDataAPI> signUp(@RequestBody @Valid SignUpRequest signUpRequest) {
-    return ResponseEntity.ok(
-        ResponseDataAPI.successWithoutMeta(userService.signUp(signUpRequest)));
+    return ResponseEntity.ok(ResponseDataAPI.successWithoutMeta(userService.signUp(signUpRequest)));
   }
 
   @PostMapping("/refresh-token")
