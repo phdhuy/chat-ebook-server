@@ -43,6 +43,24 @@ public class UserServiceImpl implements UserService {
     return userMapper.toUserInfoResponse(userRepository.save(user));
   }
 
+  @Override
+  public UserInfoResponse getMyInfo(UUID userId) {
+    User user = this.findUserById(userId);
+    return userMapper.toUserInfoResponse(user);
+  }
+
+  @Override
+  public User createUserWithGoogle(String email) {
+    User user = new User();
+
+    user.setEmail(email);
+    user.setIsConfirmed(true);
+    user.setConfirmedAt(CommonFunction.getCurrentDateTime());
+    user.setRole(Role.ROLE_USER);
+
+    return userRepository.save(user);
+  }
+
   private void checkValidSignUp(String password, String passwordConfirmation, String email) {
     if (userRepository.existsByEmail(email.toLowerCase())) {
       throw new BadRequestException(MessageConstant.EMAIL_ALREADY_IN_USE);

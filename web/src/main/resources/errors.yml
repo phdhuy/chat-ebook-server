@@ -39,3 +39,6 @@ expired_token:
 revoked_token:
   code: ERR.TOK0106
   message: Token was be revoked!
+invalid_access_token_google:
+  code: ERR.TOK0107
+  message: Invalid access token google!

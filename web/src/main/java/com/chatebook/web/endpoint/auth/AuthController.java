@@ -8,7 +8,9 @@ import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.security.model.UserPrincipal;
 import com.chatebook.security.payload.request.RefreshTokenRequest;
 import com.chatebook.security.payload.request.SignInRequest;
+import com.chatebook.security.payload.request.SignInWithGoogleRequest;
 import com.chatebook.security.payload.request.SignUpRequest;
+import com.chatebook.security.service.Oauth2Service;
 import com.chatebook.security.service.UserService;
 import com.chatebook.security.token.TokenProvider;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,6 +37,8 @@ public class AuthController {
 
   private final AuthenticationManager authenticationManager;
 
+  private final Oauth2Service oauth2Service;
+
   @PostMapping("/sign-in")
   public ResponseEntity<ResponseDataAPI> signIn(@RequestBody @Valid SignInRequest signInRequest) {
     try {
@@ -54,6 +58,22 @@ public class AuthController {
     } catch (BadCredentialsException ex) {
       throw new BadRequestException(MessageConstant.INCORRECT_EMAIL_OR_PASSWORD);
     }
+  }
+
+  @PostMapping("/google")
+  public ResponseEntity<ResponseDataAPI> signInWithGoogle(
+      @RequestBody @Valid SignInWithGoogleRequest signInWithGoogleRequest) {
+    UserPrincipal userPrincipal =
+        UserPrincipal.create(
+            oauth2Service.signInWithGoogle(signInWithGoogleRequest.getAccessToken()));
+
+    UsernamePasswordAuthenticationToken authentication =
+        new UsernamePasswordAuthenticationToken(
+            userPrincipal, null, userPrincipal.getAuthorities());
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+    return ResponseEntity.ok(
+        ResponseDataAPI.successWithoutMeta(tokenProvider.createOauthToken(userPrincipal)));
   }
 
   @PostMapping("/sign-up")
