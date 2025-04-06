@@ -21,4 +21,7 @@ public final class CommonConstant {
   public static final String ASC = "asc";
 
   public static final String DESC = "desc";
+
+  public static final String GOOGLE_AUTH_URL =
+      "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
 }

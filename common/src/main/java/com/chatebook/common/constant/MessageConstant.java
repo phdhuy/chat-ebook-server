@@ -25,6 +25,8 @@ public final class MessageConstant {
 
   public static final String REVOKED_TOKEN = "revoked_token";
 
+  public static final String INVALID_ACCESS_TOKEN_GOOGLE = "invalid_access_token_google";
+
   // User
   public static final String USER_NOT_FOUND = "user_not_found";
 
@@ -39,16 +41,4 @@ public final class MessageConstant {
       "password_and_confirmation_password_is_not_match";
 
   public static final String EMAIL_ALREADY_IN_USE = "email_already_in_use";
-
-  // User info
-  public static final String USER_INFO_ALREADY_EXISTS = "user_info_already_exists";
-
-  public static final String USER_INFO_NOT_FOUND = "user_info_not_found";
-
-  // Teacher profile
-
-  public static final String TEACHER_PROFILE_NOT_FOUND = "teacher_profile_not_found";
-
-  // Parent profile
-  public static final String PARENT_PROFILE_NOT_FOUND = "parent_profile_not_found";
 }

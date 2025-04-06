@@ -38,3 +38,10 @@ sign_in_request:
     pattern:
       code: VAL.SIR0202
       message: Password must be follow pattern!
+
+#SignInWithGoogleRequest
+sign_in_with_google_request:
+  access_token:
+    not_blank:
+      code: VAL.SIR0301
+      message: Access token must be not blank!
