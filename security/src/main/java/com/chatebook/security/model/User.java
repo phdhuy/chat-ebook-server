@@ -33,4 +33,8 @@ public class User extends AbstractEntity {
 
   @Column(nullable = false)
   private Boolean isConfirmed = false;
+
+  @Column private String username;
+
+  @Column private String avatarUrl;
 }

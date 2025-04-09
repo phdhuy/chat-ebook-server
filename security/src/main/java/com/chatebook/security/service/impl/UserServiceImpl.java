@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService {
 
     User user = new User();
     user.setEmail(signUpRequest.getEmail().toLowerCase());
+    user.setUsername(CommonFunction.getUsernameFromEmail(signUpRequest.getEmail().toLowerCase()));
     user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
     user.setIsConfirmed(true);
     user.setConfirmedAt(CommonFunction.getCurrentDateTime());
@@ -50,13 +51,15 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User createUserWithGoogle(String email) {
+  public User createUserWithGoogle(String email, String avatarUrl, String username) {
     User user = new User();
 
     user.setEmail(email);
     user.setIsConfirmed(true);
     user.setConfirmedAt(CommonFunction.getCurrentDateTime());
     user.setRole(Role.ROLE_USER);
+    user.setAvatarUrl(avatarUrl);
+    user.setUsername(username);
 
     return userRepository.save(user);
   }

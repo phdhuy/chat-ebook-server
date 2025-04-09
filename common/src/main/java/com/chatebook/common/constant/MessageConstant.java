@@ -41,4 +41,7 @@ public final class MessageConstant {
       "password_and_confirmation_password_is_not_match";
 
   public static final String EMAIL_ALREADY_IN_USE = "email_already_in_use";
+
+  // Conversation
+  public static final String CONVERSATION_NOT_FOUND = "conversation_not_found";
 }

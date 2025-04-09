@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EntityScan(basePackages = {"com.chatebook.*"})
+@EntityScan(basePackages = {"com.chatebook.*.*"})
 @EnableJpaRepositories(basePackages = {"com.chatebook.*"})
 @ComponentScan(basePackages = {"com.chatebook.*"})
 public class ChatEbookApplication {

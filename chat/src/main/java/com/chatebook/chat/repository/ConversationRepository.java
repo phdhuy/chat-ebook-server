@@ -1,0 +1,17 @@
+package com.chatebook.chat.repository;
+
+import com.chatebook.chat.model.Conversation;
+import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ConversationRepository extends JpaRepository<Conversation, UUID> {
+
+  @Query(
+      value = "SELECT c FROM conversations c WHERE c.user.id = :userId and c.deletedAt is null ORDER BY c.createdAt DESC")
+  Page<Conversation> getMyConversations(Pageable pageable, UUID userId);
+}

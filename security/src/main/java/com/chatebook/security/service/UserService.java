@@ -11,7 +11,7 @@ public interface UserService {
 
   UserInfoResponse getMyInfo(UUID userId);
 
-  User createUserWithGoogle(String email);
+  User createUserWithGoogle(String email, String avatarUrl, String username);
 
   User findUserById(UUID userId);
 

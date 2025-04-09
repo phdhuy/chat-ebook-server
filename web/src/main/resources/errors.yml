@@ -42,3 +42,8 @@ revoked_token:
 invalid_access_token_google:
   code: ERR.TOK0107
   message: Invalid access token google!
+
+# Conversation
+conversation_not_found:
+  code: ERR.CONV0101
+  message: Conversation was not found!
