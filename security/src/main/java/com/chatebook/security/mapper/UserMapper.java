@@ -14,5 +14,7 @@ public interface UserMapper {
   @Mapping(source = "user.confirmedAt", target = "confirmedAt")
   @Mapping(source = "user.createdAt", target = "createdAt")
   @Mapping(source = "user.isConfirmed", target = "isConfirmed")
+  @Mapping(source = "user.username", target = "username")
+  @Mapping(source = "user.avatarUrl", target = "avatarUrl")
   UserInfoResponse toUserInfoResponse(User user);
 }
