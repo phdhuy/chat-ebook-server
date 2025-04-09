@@ -1,24 +1,19 @@
 package com.chatebook.file.config;
 
-import io.github.cdimascio.dotenv.Dotenv;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
+@Getter
+@Setter
+@ConfigurationProperties(prefix = "cloudinary")
 public class CloudinaryProperties {
 
-  private final Dotenv dotenv;
+  private String cloudName;
 
-  public String getCloudName() {
-    return dotenv.get("CLOUDINARY_CLOUD_NAME");
-  }
+  private String apiKey;
 
-  public String getApiKey() {
-    return dotenv.get("CLOUDINARY_API_KEY");
-  }
-
-  public String getApiSecret() {
-    return dotenv.get("CLOUDINARY_API_SECRET");
-  }
+  private String apiSecret;
 }
