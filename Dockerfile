@@ -8,6 +8,7 @@ COPY file/pom.xml ./file/
 COPY mail/pom.xml ./mail/
 COPY web/pom.xml ./web/
 COPY security/pom.xml ./security/
+COPY chat/pom.xml ./chat/
 
 RUN mvn dependency:go-offline -B
 
