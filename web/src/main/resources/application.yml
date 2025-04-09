@@ -22,6 +22,9 @@ spring:
     mode: HTML
   liquibase:
     enabled: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
 auth:
   tokenSecret: 41c9425ac8d185985f513ac833b94d8def071f69a27b2c1e4e9921e805bed586
   tokenExpirationMsec: 7200000

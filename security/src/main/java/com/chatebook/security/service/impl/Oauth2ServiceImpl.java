@@ -43,7 +43,10 @@ public class Oauth2ServiceImpl implements Oauth2Service {
             objectMapper.readValue(responseBody, UserInfoGoogleResponse.class);
 
         Optional<User> user = userRepository.findByEmail(googleUser.getEmail());
-        return user.orElseGet(() -> userService.createUserWithGoogle(googleUser.getEmail()));
+        return user.orElseGet(
+            () ->
+                userService.createUserWithGoogle(
+                    googleUser.getEmail(), googleUser.getPicture(), googleUser.getName()));
       } else {
         throw new BadRequestException(MessageConstant.INVALID_ACCESS_TOKEN_GOOGLE);
       }
