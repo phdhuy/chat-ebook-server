@@ -25,4 +25,8 @@ public class UserInfoResponse {
   private Timestamp confirmedAt;
 
   private Boolean isConfirmed;
+
+  private String username;
+
+  private String avatarUrl;
 }
