@@ -5,10 +5,13 @@ import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.common.utils.PagingUtils;
 import com.chatebook.security.annotation.CurrentUser;
 import com.chatebook.security.model.UserPrincipal;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +25,15 @@ public class ConversationController {
 
   private final ConversationService conversationService;
 
-  @PostMapping
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @PreAuthorize("hasRole('USER')")
+  @Operation(
+      summary = "Create Conversation",
+      description = "Creates a conversation using an uploaded file.")
   public ResponseEntity<ResponseDataAPI> createConversation(
-      @CurrentUser UserPrincipal userPrincipal, @RequestParam(value = "file") MultipartFile file) {
+      @CurrentUser UserPrincipal userPrincipal,
+      @Parameter(description = "File to upload", required = true) @RequestPart("file")
+          MultipartFile file) {
     return ResponseEntity.ok(
         ResponseDataAPI.successWithoutMeta(
             conversationService.createConversation(userPrincipal.getId(), file)));
@@ -46,7 +54,7 @@ public class ConversationController {
 
   @GetMapping("/{conversationId}")
   @PreAuthorize("hasRole('USER')")
-  public ResponseEntity<ResponseDataAPI> getMyConversations(
+  public ResponseEntity<ResponseDataAPI> getDetailConversation(
       @PathVariable UUID conversationId, @CurrentUser UserPrincipal userPrincipal) {
     return ResponseEntity.ok(
         ResponseDataAPI.successWithoutMeta(
