@@ -4,6 +4,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -27,5 +30,17 @@ public class WebMvcConfig implements WebMvcConfigurer {
         .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
         .allowedHeaders("*")
         .maxAge(MAX_AGE_SECS);
+  }
+
+  @Bean
+  public CorsFilter corsFilter() {
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    CorsConfiguration config = new CorsConfiguration();
+    config.addAllowedOrigin("*");
+    config.addAllowedMethod("*");
+    config.addAllowedHeader("*");
+    config.setMaxAge(MAX_AGE_SECS);
+    source.registerCorsConfiguration("/**", config);
+    return new CorsFilter(source);
   }
 }
