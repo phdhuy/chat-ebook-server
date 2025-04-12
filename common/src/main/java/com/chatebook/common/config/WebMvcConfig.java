@@ -1,13 +1,14 @@
 package com.chatebook.common.config;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -21,19 +22,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
-
-  @Override
-  public void addCorsMappings(CorsRegistry registry) {
-    registry
-        .addMapping("/**")
-        .allowedOrigins("*")
-        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-        .allowedHeaders("*")
-        .maxAge(MAX_AGE_SECS);
-  }
-
   @Bean
-  public CorsFilter corsFilter() {
+  public FilterRegistrationBean<CorsFilter> corsFilterRegistration() {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     CorsConfiguration config = new CorsConfiguration();
     config.addAllowedOrigin("*");
@@ -41,6 +31,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
     config.addAllowedHeader("*");
     config.setMaxAge(MAX_AGE_SECS);
     source.registerCorsConfiguration("/**", config);
-    return new CorsFilter(source);
+    CorsFilter corsFilter = new CorsFilter(source);
+
+    FilterRegistrationBean<CorsFilter> registration = new FilterRegistrationBean<>(corsFilter);
+    registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+
+    return registration;
   }
 }

@@ -11,7 +11,7 @@ public interface OauthTokenService {
 
   OauthToken getOauthTokenByRefreshToken(UUID refreshTokenId);
 
-  void revoke(OauthToken oauthToken);
+  void revoke(UUID oauthTokenId);
 
   void revokeAll(OauthToken oauthToken, String email);
 }

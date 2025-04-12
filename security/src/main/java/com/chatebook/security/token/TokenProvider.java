@@ -123,4 +123,11 @@ public class TokenProvider {
         tokenProperties.getTokenExpirationMsec() / 1000,
         result.getCreatedAt());
   }
+
+  public void revokeToken(String refreshToken) {
+    this.validateRefreshToken(refreshToken, tokenProperties.getRefreshTokenSecret());
+    UUID refreshTokenId =
+        this.getUUIDFromToken(refreshToken, tokenProperties.getRefreshTokenSecret());
+    oauthTokenService.revoke(refreshTokenId);
+  }
 }

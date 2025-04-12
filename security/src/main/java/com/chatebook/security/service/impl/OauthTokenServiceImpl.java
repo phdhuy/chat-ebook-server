@@ -55,7 +55,14 @@ public class OauthTokenServiceImpl implements OauthTokenService {
   }
 
   @Override
-  public void revoke(OauthToken oauthToken) {
+  public void revoke(UUID refreshTokenId) {
+    OauthToken oauthToken =
+        oauthTokenRepository
+            .findByRefreshToken(refreshTokenId)
+            .orElseThrow(() -> new NotFoundException(MessageConstant.OAUTH_TOKEN_NOT_FOUND));
+    if (oauthToken.getRevokedAt() != null) {
+      throw new ForbiddenException(MessageConstant.REVOKED_TOKEN);
+    }
     oauthToken.setRevokedAt(CommonFunction.getCurrentDateTime());
     oauthTokenRepository.save(oauthToken);
   }
