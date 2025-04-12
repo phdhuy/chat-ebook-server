@@ -54,7 +54,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
       LogUtils.error(request.getMethod(), request.getRequestURL().toString(), ex.getMessage());
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
       response.setContentType("application/json");
-      response.setHeader("Access-Control-Allow-Origin", "*");
       response.setCharacterEncoding("UTF-8");
       ErrorResponse error = CommonFunction.getExceptionError(ex.getMessage());
       ResponseDataAPI responseDataAPI = ResponseDataAPI.error(error);

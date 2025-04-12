@@ -88,4 +88,11 @@ public class AuthController {
         ResponseDataAPI.successWithoutMeta(
             tokenProvider.refreshTokenOauthToken(refreshTokenRequest.getRefreshToken(), false)));
   }
+
+  @PostMapping("/revoke-token")
+  public ResponseEntity<ResponseDataAPI> revokeToken(
+      @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
+    tokenProvider.revokeToken(refreshTokenRequest.getRefreshToken());
+    return ResponseEntity.ok(ResponseDataAPI.successWithoutMetaAndData());
+  }
 }
