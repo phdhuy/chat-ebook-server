@@ -12,7 +12,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,34 +29,31 @@ public class ConversationController {
   @Operation(
       summary = "Create Conversation",
       description = "Creates a conversation using an uploaded file.")
-  public ResponseEntity<ResponseDataAPI> createConversation(
+  public ResponseDataAPI createConversation(
       @CurrentUser UserPrincipal userPrincipal,
       @Parameter(description = "File to upload", required = true) @RequestPart("file")
           MultipartFile file) {
-    return ResponseEntity.ok(
-        ResponseDataAPI.successWithoutMeta(
-            conversationService.createConversation(userPrincipal.getId(), file)));
+    return ResponseDataAPI.successWithoutMeta(
+        conversationService.createConversation(userPrincipal.getId(), file));
   }
 
   @GetMapping
   @PreAuthorize("hasRole('USER')")
-  public ResponseEntity<ResponseDataAPI> getMyConversations(
+  public ResponseDataAPI getMyConversations(
       @CurrentUser UserPrincipal userPrincipal,
       @RequestParam(name = "sort", defaultValue = "created_at") String sortBy,
       @RequestParam(name = "order", defaultValue = "asc") String order,
       @RequestParam(name = "page", defaultValue = "1") int page,
       @RequestParam(name = "paging", defaultValue = "30") int paging) {
     Pageable pageable = PagingUtils.makePageRequestWithCamelCase(sortBy, order, page, paging);
-    return ResponseEntity.ok(
-        conversationService.getMyConversations(pageable, userPrincipal.getId()));
+    return conversationService.getMyConversations(pageable, userPrincipal.getId());
   }
 
   @GetMapping("/{conversationId}")
   @PreAuthorize("hasRole('USER')")
-  public ResponseEntity<ResponseDataAPI> getDetailConversation(
+  public ResponseDataAPI getDetailConversation(
       @PathVariable UUID conversationId, @CurrentUser UserPrincipal userPrincipal) {
-    return ResponseEntity.ok(
-        ResponseDataAPI.successWithoutMeta(
-            conversationService.getDetailConversation(userPrincipal.getId(), conversationId)));
+    return ResponseDataAPI.successWithoutMeta(
+        conversationService.getDetailConversation(userPrincipal.getId(), conversationId));
   }
 }
