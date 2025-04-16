@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
-    <!-- Loki appender sends logs via HTTP to Loki -->
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
         <http>
             <url>http://loki:3100/loki/api/v1/push</url>
@@ -18,7 +16,6 @@
                     "class": "%logger{36}",
                     "thread": "%thread",
                     "message": "%message",
-                    "requestId": "%X{X-Request-ID}"
                     }
                 </pattern>
             </message>

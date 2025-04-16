@@ -1,0 +1,8 @@
+spring:
+  jpa:
+    show-sql: true
+logging:
+  level:
+    org.hibernate.sql: info
+    org.hibernate.type.descriptor.sql.BasicBinder: info
+    org.hibernate.orm.jdbc.bind: info

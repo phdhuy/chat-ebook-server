@@ -4,8 +4,12 @@ import com.chatebook.common.constant.CommonConstant;
 import com.chatebook.common.payload.response.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -14,6 +18,15 @@ public final class CommonFunction {
   private static final String ERROR_FILE = "errors.yml";
 
   private static final String VALIDATION_FILE = "validations.yml";
+
+  private static final String CHARACTERS =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  private static final int RANDOM_LENGTH = 10;
+
+  private static final Random RANDOM = new Random();
+
+  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
   CommonFunction() {}
 
@@ -109,5 +122,19 @@ public final class CommonFunction {
 
   public static String getUsernameFromEmail(String email) {
     return email.split("@")[0];
+  }
+
+  public static String generateQueueName(UUID userId) {
+    String randomPart = generateRandomString(RANDOM_LENGTH);
+    String timestamp = LocalDateTime.now().format(FORMATTER);
+    return "user-queue-" + randomPart + "-" + timestamp + "-" + userId;
+  }
+
+  private static String generateRandomString(int length) {
+    StringBuilder sb = new StringBuilder(length);
+    for (int i = 0; i < length; i++) {
+      sb.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
+    }
+    return sb.toString();
   }
 }
