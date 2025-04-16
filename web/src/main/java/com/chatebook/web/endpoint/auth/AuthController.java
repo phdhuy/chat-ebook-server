@@ -16,7 +16,6 @@ import com.chatebook.security.token.TokenProvider;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,7 +39,7 @@ public class AuthController {
   private final Oauth2Service oauth2Service;
 
   @PostMapping("/sign-in")
-  public ResponseEntity<ResponseDataAPI> signIn(@RequestBody @Valid SignInRequest signInRequest) {
+  public ResponseDataAPI signIn(@RequestBody @Valid SignInRequest signInRequest) {
     try {
       Authentication authentication =
           authenticationManager.authenticate(
@@ -52,8 +51,7 @@ public class AuthController {
         throw new UnauthorizedException(MessageConstant.UNAUTHORIZED);
       }
 
-      return ResponseEntity.ok(
-          ResponseDataAPI.successWithoutMeta(tokenProvider.createOauthToken(userPrincipal)));
+      return ResponseDataAPI.successWithoutMeta(tokenProvider.createOauthToken(userPrincipal));
 
     } catch (BadCredentialsException ex) {
       throw new BadRequestException(MessageConstant.INCORRECT_EMAIL_OR_PASSWORD);
@@ -61,7 +59,7 @@ public class AuthController {
   }
 
   @PostMapping("/google")
-  public ResponseEntity<ResponseDataAPI> signInWithGoogle(
+  public ResponseDataAPI signInWithGoogle(
       @RequestBody @Valid SignInWithGoogleRequest signInWithGoogleRequest) {
     UserPrincipal userPrincipal =
         UserPrincipal.create(
@@ -72,27 +70,23 @@ public class AuthController {
             userPrincipal, null, userPrincipal.getAuthorities());
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    return ResponseEntity.ok(
-        ResponseDataAPI.successWithoutMeta(tokenProvider.createOauthToken(userPrincipal)));
+    return ResponseDataAPI.successWithoutMeta(tokenProvider.createOauthToken(userPrincipal));
   }
 
   @PostMapping("/sign-up")
-  public ResponseEntity<ResponseDataAPI> signUp(@RequestBody @Valid SignUpRequest signUpRequest) {
-    return ResponseEntity.ok(ResponseDataAPI.successWithoutMeta(userService.signUp(signUpRequest)));
+  public ResponseDataAPI signUp(@RequestBody @Valid SignUpRequest signUpRequest) {
+    return ResponseDataAPI.successWithoutMeta(userService.signUp(signUpRequest));
   }
 
   @PostMapping("/refresh-token")
-  public ResponseEntity<ResponseDataAPI> refreshToken(
-      @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
-    return ResponseEntity.ok(
-        ResponseDataAPI.successWithoutMeta(
-            tokenProvider.refreshTokenOauthToken(refreshTokenRequest.getRefreshToken(), false)));
+  public ResponseDataAPI refreshToken(@RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
+    return ResponseDataAPI.successWithoutMeta(
+        tokenProvider.refreshTokenOauthToken(refreshTokenRequest.getRefreshToken(), false));
   }
 
   @PostMapping("/revoke-token")
-  public ResponseEntity<ResponseDataAPI> revokeToken(
-      @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
+  public ResponseDataAPI revokeToken(@RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
     tokenProvider.revokeToken(refreshTokenRequest.getRefreshToken());
-    return ResponseEntity.ok(ResponseDataAPI.successWithoutMetaAndData());
+    return ResponseDataAPI.successWithoutMetaAndData();
   }
 }

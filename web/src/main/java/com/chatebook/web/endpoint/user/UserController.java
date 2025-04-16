@@ -10,7 +10,6 @@ import com.chatebook.security.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.*;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,14 +25,13 @@ public class UserController {
 
   @GetMapping("/me")
   @PreAuthorize("hasRole('USER')")
-  public ResponseEntity<ResponseDataAPI> getMyProfile(@CurrentUser UserPrincipal userPrincipal) {
-    return ResponseEntity.ok(
-        ResponseDataAPI.successWithoutMeta(userService.getMyInfo(userPrincipal.getId())));
+  public ResponseDataAPI getMyProfile(@CurrentUser UserPrincipal userPrincipal) {
+    return ResponseDataAPI.successWithoutMeta(userService.getMyInfo(userPrincipal.getId()));
   }
 
   @PostMapping("/queues")
   @PreAuthorize("hasRole('USER')")
-  public ResponseEntity<ResponseDataAPI> createQueue(@CurrentUser UserPrincipal userPrincipal) {
+  public ResponseDataAPI createQueue(@CurrentUser UserPrincipal userPrincipal) {
     String queueName = CommonFunction.generateQueueName(userPrincipal.getId());
     Queue queue = new Queue(queueName, true, false, true);
     amqpAdmin.declareQueue(queue);
@@ -45,8 +43,7 @@ public class UserController {
 
     amqpAdmin.declareBinding(binding);
 
-    return ResponseEntity.ok(
-        ResponseDataAPI.successWithoutMeta(
-            QueueNameResponse.builder().queueName(queueName).build()));
+    return ResponseDataAPI.successWithoutMeta(
+        QueueNameResponse.builder().queueName(queueName).build());
   }
 }
