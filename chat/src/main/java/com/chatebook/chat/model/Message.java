@@ -17,8 +17,7 @@ import lombok.Setter;
 public class Message extends AbstractEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "message_seq")
-  @SequenceGenerator(name = "message_seq", sequenceName = "messages_seq", allocationSize = 50)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column private String content;
