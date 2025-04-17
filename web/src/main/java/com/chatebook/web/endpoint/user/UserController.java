@@ -38,8 +38,8 @@ public class UserController {
 
     Binding binding =
         BindingBuilder.bind(queue)
-            .to(new DirectExchange(RabbitMQConfig.EXCHANGE_NAME))
-            .with(queueName);
+            .to(new DirectExchange(RabbitMQConfig.DIRECT_EXCHANGE_NAME))
+            .with(userPrincipal.getId().toString());
 
     amqpAdmin.declareBinding(binding);
 
