@@ -17,7 +17,7 @@ jobs:
           username: ${{ secrets.CLOUD_USERNAME }}
           password: ${{ secrets.CLOUD_PASSWORD }}
           script: |
-            cd workspace
+            cd chat-ebook
             cd chat-ebook-server
             docker-compose down
             git pull origin main
