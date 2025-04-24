@@ -10,11 +10,13 @@ import com.chatebook.chat.repository.MessageRepository;
 import com.chatebook.chat.service.ConversationService;
 import com.chatebook.chat.service.MessageService;
 import com.chatebook.common.config.RabbitMQConfig;
-import com.chatebook.common.constant.MessageConstant;
-import com.chatebook.common.exception.ForbiddenException;
+import com.chatebook.common.payload.general.PageInfo;
+import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.common.utils.RabbitMQAdapter;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,11 +36,8 @@ public class MessageServiceImpl implements MessageService {
   @Transactional
   public MessageInfoResponse sendMessage(
       UUID userId, UUID conversationId, CreateMessageRequest createMessageRequest) {
-    Conversation conversation = conversationService.findById(conversationId);
-
-    if (!conversation.getUser().getId().equals(userId)) {
-      throw new ForbiddenException(MessageConstant.FORBIDDEN_ERROR);
-    }
+    Conversation conversation =
+        conversationService.checkConversationOwnership(conversationId, userId);
 
     Message newMessage = new Message();
 
@@ -53,5 +52,24 @@ public class MessageServiceImpl implements MessageService {
         RabbitMQConfig.DIRECT_EXCHANGE_NAME, userId.toString(), messageInfoResponse);
 
     return messageInfoResponse;
+  }
+
+  @Override
+  public ResponseDataAPI getListMessageByConversationId(
+      Pageable pageable, UUID userId, UUID conversationId) {
+    Conversation conversation =
+        conversationService.checkConversationOwnership(conversationId, userId);
+
+    Page<Message> messages =
+        messageRepository.findAllByConversationId(pageable, conversation.getId());
+
+    PageInfo pageInfo =
+        new PageInfo(
+            pageable.getPageNumber() + 1, messages.getTotalPages(), messages.getTotalElements());
+
+    return ResponseDataAPI.success(
+        messages.stream()
+            .map(message -> messageMapper.toMessageInfoResponse(message, conversationId)),
+        pageInfo);
   }
 }

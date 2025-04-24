@@ -127,7 +127,7 @@ public final class CommonFunction {
   public static String generateQueueName(UUID userId) {
     String randomPart = generateRandomString(RANDOM_LENGTH);
     String timestamp = LocalDateTime.now().format(FORMATTER);
-    return "user-queue-" + randomPart + "-" + timestamp + "-" + userId;
+    return randomPart + "-" + timestamp + "-" + userId;
   }
 
   private static String generateRandomString(int length) {

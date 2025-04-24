@@ -13,5 +13,6 @@ public interface MessageMapper {
   @Mapping(source = "message.id", target = "id")
   @Mapping(source = "message.createdAt", target = "createdAt")
   @Mapping(source = "conversationId", target = "conversationId")
+  @Mapping(source = "message.senderType", target = "senderType")
   MessageInfoResponse toMessageInfoResponse(Message message, UUID conversationId);
 }

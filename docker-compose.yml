@@ -19,8 +19,8 @@ services:
     image: "rabbitmq:management"
     container_name: rabbitmq-chat-ebook
     ports:
-      - "5673:5672"
-      - "15673:15672"
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq/data
     networks:

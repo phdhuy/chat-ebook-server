@@ -86,4 +86,13 @@ public class ConversationServiceImpl implements ConversationService {
         .findById(conversationId)
         .orElseThrow(() -> new NotFoundException(MessageConstant.CONVERSATION_NOT_FOUND));
   }
+
+  @Override
+  public Conversation checkConversationOwnership(UUID conversationId, UUID userId) {
+    Conversation conversation = this.findById(conversationId);
+    if (!conversation.getUser().getId().equals(userId)) {
+      throw new ForbiddenException(MessageConstant.FORBIDDEN_ERROR);
+    }
+    return conversation;
+  }
 }
