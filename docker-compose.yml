@@ -16,15 +16,20 @@ services:
       - chat-ebook-network
 
   rabbitmq:
-    image: "rabbitmq:management"
+    image: rabbitmq:management
     container_name: rabbitmq-chat-ebook
     ports:
       - "5672:5672"
       - "15672:15672"
+      - "15674:15674"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq/data
     networks:
       - chat-ebook-network
+    command: >
+      sh -c "rabbitmq-plugins enable --offline rabbitmq_web_stomp &&
+             rabbitmq-plugins enable --offline rabbitmq_stomp &&
+             rabbitmq-server"
 
   redis:
     image: redis:latest
