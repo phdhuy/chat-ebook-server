@@ -16,4 +16,6 @@ public interface ConversationService {
   ConversationInfoResponse getDetailConversation(UUID userId, UUID conversationId);
 
   Conversation findById(UUID conversationId);
+
+  Conversation checkConversationOwnership(UUID conversationId, UUID userId);
 }
