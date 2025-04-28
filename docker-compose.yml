@@ -124,3 +124,4 @@ volumes:
 networks:
   chat-ebook-network:
     driver: bridge
+    name: chat-ebook-network

@@ -9,12 +9,15 @@ import com.chatebook.chat.payload.response.MessageInfoResponse;
 import com.chatebook.chat.repository.MessageRepository;
 import com.chatebook.chat.service.ConversationService;
 import com.chatebook.chat.service.MessageService;
+import com.chatebook.common.ai.service.AIService;
 import com.chatebook.common.config.RabbitMQConfig;
 import com.chatebook.common.payload.general.PageInfo;
 import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.common.utils.RabbitMQAdapter;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,11 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MessageServiceImpl implements MessageService {
 
   private final MessageRepository messageRepository;
 
   private final ConversationService conversationService;
+
+  private final AIService aiService;
 
   private final RabbitMQAdapter rabbitMQAdapter;
 
@@ -50,6 +56,32 @@ public class MessageServiceImpl implements MessageService {
 
     rabbitMQAdapter.pushMessageToQueue(
         RabbitMQConfig.DIRECT_EXCHANGE_NAME, userId.toString(), messageInfoResponse);
+
+    CompletableFuture<String> aiResponseFuture =
+        aiService.sendMessage(createMessageRequest.getContent(), userId);
+    aiResponseFuture
+        .thenAccept(
+            aiResponse -> {
+              Message aiMessage = new Message();
+
+              aiMessage.setContent(aiResponse);
+              aiMessage.setSenderType(SenderType.BOT);
+              aiMessage.setConversation(conversation);
+
+              log.info("AI response saved for conversation {}", conversationId);
+
+              MessageInfoResponse aiMessageInfoResponse =
+                  messageMapper.toMessageInfoResponse(
+                      messageRepository.save(aiMessage), conversationId);
+
+              rabbitMQAdapter.pushMessageToQueue(
+                  RabbitMQConfig.DIRECT_EXCHANGE_NAME, userId.toString(), aiMessageInfoResponse);
+            })
+        .exceptionally(
+            throwable -> {
+              log.error("Failed to process AI response: {}", throwable.getMessage());
+              return null;
+            });
 
     return messageInfoResponse;
   }
