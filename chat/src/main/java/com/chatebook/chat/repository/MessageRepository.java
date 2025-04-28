@@ -12,6 +12,6 @@ import org.springframework.stereotype.Repository;
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
   @Query(
-      "SELECT m from messages m WHERE m.conversation.id = :conversationId and m.deletedAt is null ORDER BY m.createdAt DESC")
+      "SELECT m from messages m WHERE m.conversation.id = :conversationId and m.deletedAt is null")
   Page<Message> findAllByConversationId(Pageable pageable, UUID conversationId);
 }
