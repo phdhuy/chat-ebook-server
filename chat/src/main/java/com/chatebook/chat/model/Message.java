@@ -20,7 +20,8 @@ public class Message extends AbstractEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column private String content;
+  @Column(columnDefinition = "TEXT", nullable = false)
+  private String content;
 
   @Column
   @Enumerated(EnumType.STRING)

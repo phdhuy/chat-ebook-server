@@ -10,6 +10,7 @@ import com.chatebook.common.exception.ForbiddenException;
 import com.chatebook.common.exception.NotFoundException;
 import com.chatebook.common.payload.general.PageInfo;
 import com.chatebook.common.payload.general.ResponseDataAPI;
+import com.chatebook.common.ai.service.AIService;
 import com.chatebook.file.mapper.FileMapper;
 import com.chatebook.file.service.FileService;
 import com.chatebook.security.repository.UserRepository;
@@ -31,6 +32,8 @@ public class ConversationServiceImpl implements ConversationService {
 
   private final FileService fileService;
 
+  private final AIService aiService;
+
   private final FileMapper fileMapper;
 
   private final ConversationMapper conversationMapper;
@@ -43,6 +46,8 @@ public class ConversationServiceImpl implements ConversationService {
     conversation.setFile(fileService.saveInfoUploadFile(file));
     conversation.setName(file.getOriginalFilename());
     conversation.setUser(userRepository.getReferenceById(userId));
+
+    aiService.uploadFile(file);
 
     return conversationMapper.toConversationInfoResponse(
         conversationRepository.save(conversation),
