@@ -63,6 +63,9 @@ services:
       - postgres
       - rabbitmq
       - redis
+      - tempo
+      - loki
+      - prometheus
     networks:
       - chat-ebook-network
 
@@ -78,42 +81,51 @@ services:
     networks:
       - chat-ebook-network
 
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observation/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - chat-ebook-network
+
+  tempo:
+    image: grafana/tempo
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./observation/tempo/tempo.yml:/etc/tempo.yaml:ro
+      - ./observation/tempo/tempo-data:/tmp/tempo
+    ports:
+      - "3200:3200"
+      - "9411:9411"
+    networks:
+      - chat-ebook-network
+
   loki:
-    image: grafana/loki:2.9.0
-    container_name: loki-chat-ebook
+    image: grafana/loki:main
+    container_name: loki
+    command: [ "-config.file=/etc/loki/local-config.yaml" ]
     ports:
       - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
     networks:
       - chat-ebook-network
 
   grafana:
-    environment:
-      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-    entrypoint:
-      - sh
-      - -euc
-      - |
-        mkdir -p /etc/grafana/provisioning/datasources
-        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
-        apiVersion: 1
-        datasources:
-        - name: Loki
-          type: loki
-          access: proxy
-          orgId: 1
-          url: http://loki:3100
-          basicAuth: false
-          isDefault: true
-          version: 1
-          editable: false
-        EOF
-        /run.sh
-    image: grafana/grafana:latest
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
     ports:
       - "3000:3000"
+    volumes:
+      - ./observation/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./observation/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password
     networks:
       - chat-ebook-network
 
