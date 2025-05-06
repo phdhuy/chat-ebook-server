@@ -37,8 +37,8 @@ public class MessageController {
   public ResponseDataAPI getListMessageByConversationId(
       @CurrentUser UserPrincipal userPrincipal,
       @PathVariable UUID conversationId,
-      @RequestParam(name = "sort", defaultValue = "created_at") String sortBy,
-      @RequestParam(name = "order", defaultValue = "asc") String order,
+      @RequestParam(name = "sort", defaultValue = "id") String sortBy,
+      @RequestParam(name = "order", defaultValue = "desc") String order,
       @RequestParam(name = "page", defaultValue = "1") int page,
       @RequestParam(name = "paging", defaultValue = "30") int paging) {
     Pageable pageable = PagingUtils.makePageRequestWithCamelCase(sortBy, order, page, paging);
