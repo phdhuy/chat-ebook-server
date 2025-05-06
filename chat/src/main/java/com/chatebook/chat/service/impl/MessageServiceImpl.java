@@ -14,6 +14,8 @@ import com.chatebook.common.config.RabbitMQConfig;
 import com.chatebook.common.payload.general.PageInfo;
 import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.common.utils.RabbitMQAdapter;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
@@ -92,16 +94,19 @@ public class MessageServiceImpl implements MessageService {
     Conversation conversation =
         conversationService.checkConversationOwnership(conversationId, userId);
 
-    Page<Message> messages =
-        messageRepository.findAllByConversationId(pageable, conversation.getId());
+    Page<Message> page = messageRepository.findAllByConversationId(pageable, conversation.getId());
+
+    List<MessageInfoResponse> data =
+        new java.util.ArrayList<>(
+            page.stream()
+                .map(msg -> messageMapper.toMessageInfoResponse(msg, conversationId))
+                .toList());
+
+    Collections.reverse(data);
 
     PageInfo pageInfo =
-        new PageInfo(
-            pageable.getPageNumber() + 1, messages.getTotalPages(), messages.getTotalElements());
+        new PageInfo(pageable.getPageNumber() + 1, page.getTotalPages(), page.getTotalElements());
 
-    return ResponseDataAPI.success(
-        messages.stream()
-            .map(message -> messageMapper.toMessageInfoResponse(message, conversationId)),
-        pageInfo);
+    return ResponseDataAPI.success(data, pageInfo);
   }
 }
