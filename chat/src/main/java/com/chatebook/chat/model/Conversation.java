@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Setter
@@ -17,6 +18,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table
 @Entity(name = "conversations")
+@SQLRestriction("deleted_at is NULL")
 public class Conversation extends AbstractEntity {
 
   @Id @GeneratedValue private UUID id;

@@ -1,6 +1,7 @@
 package com.chatebook.chat.service;
 
 import com.chatebook.chat.model.Conversation;
+import com.chatebook.chat.payload.request.UpdateConversationRequest;
 import com.chatebook.chat.payload.response.ConversationInfoResponse;
 import com.chatebook.common.payload.general.ResponseDataAPI;
 import java.util.UUID;
@@ -18,4 +19,9 @@ public interface ConversationService {
   Conversation findById(UUID conversationId);
 
   Conversation checkConversationOwnership(UUID conversationId, UUID userId);
+
+  void deleteConversation(UUID conversationId, UUID userId);
+
+  ConversationInfoResponse updateInfoConversation(
+      UUID userId, UUID conversationId, UpdateConversationRequest updateConversationRequest);
 }

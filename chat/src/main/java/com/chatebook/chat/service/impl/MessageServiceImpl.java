@@ -70,8 +70,6 @@ public class MessageServiceImpl implements MessageService {
               aiMessage.setSenderType(SenderType.BOT);
               aiMessage.setConversation(conversation);
 
-              log.info("AI response saved for conversation {}", conversationId);
-
               MessageInfoResponse aiMessageInfoResponse =
                   messageMapper.toMessageInfoResponse(
                       messageRepository.save(aiMessage), conversationId);
