@@ -1,5 +1,6 @@
 package com.chatebook.web.endpoint.chat;
 
+import com.chatebook.chat.payload.request.UpdateConversationRequest;
 import com.chatebook.chat.service.ConversationService;
 import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.common.utils.PagingUtils;
@@ -8,6 +9,7 @@ import com.chatebook.security.model.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -55,5 +57,24 @@ public class ConversationController {
       @PathVariable UUID conversationId, @CurrentUser UserPrincipal userPrincipal) {
     return ResponseDataAPI.successWithoutMeta(
         conversationService.getDetailConversation(userPrincipal.getId(), conversationId));
+  }
+
+  @DeleteMapping("/{conversationId}")
+  @PreAuthorize("hasRole('USER')")
+  public ResponseDataAPI deleteConversation(
+      @PathVariable UUID conversationId, @CurrentUser UserPrincipal userPrincipal) {
+    conversationService.deleteConversation(conversationId, userPrincipal.getId());
+    return ResponseDataAPI.successWithoutMetaAndData();
+  }
+
+  @PutMapping("/{conversationId}")
+  @PreAuthorize("hasRole('USER')")
+  public ResponseDataAPI updateConversation(
+      @PathVariable UUID conversationId,
+      @CurrentUser UserPrincipal userPrincipal,
+      @Valid @RequestBody UpdateConversationRequest updateConversationRequest) {
+    return ResponseDataAPI.successWithoutMeta(
+        conversationService.updateInfoConversation(
+            userPrincipal.getId(), conversationId, updateConversationRequest));
   }
 }

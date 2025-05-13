@@ -2,15 +2,17 @@ package com.chatebook.chat.service.impl;
 
 import com.chatebook.chat.mapper.ConversationMapper;
 import com.chatebook.chat.model.Conversation;
+import com.chatebook.chat.payload.request.UpdateConversationRequest;
 import com.chatebook.chat.payload.response.ConversationInfoResponse;
 import com.chatebook.chat.repository.ConversationRepository;
 import com.chatebook.chat.service.ConversationService;
+import com.chatebook.common.ai.service.AIService;
+import com.chatebook.common.common.CommonFunction;
 import com.chatebook.common.constant.MessageConstant;
 import com.chatebook.common.exception.ForbiddenException;
 import com.chatebook.common.exception.NotFoundException;
 import com.chatebook.common.payload.general.PageInfo;
 import com.chatebook.common.payload.general.ResponseDataAPI;
-import com.chatebook.common.ai.service.AIService;
 import com.chatebook.file.mapper.FileMapper;
 import com.chatebook.file.service.FileService;
 import com.chatebook.security.repository.UserRepository;
@@ -99,5 +101,26 @@ public class ConversationServiceImpl implements ConversationService {
       throw new ForbiddenException(MessageConstant.FORBIDDEN_ERROR);
     }
     return conversation;
+  }
+
+  @Override
+  public void deleteConversation(UUID conversationId, UUID userId) {
+    Conversation conversation = this.checkConversationOwnership(conversationId, userId);
+
+    conversation.setDeletedAt(CommonFunction.getCurrentDateTime());
+    conversationRepository.save(conversation);
+  }
+
+  @Override
+  public ConversationInfoResponse updateInfoConversation(
+      UUID userId, UUID conversationId, UpdateConversationRequest updateConversationRequest) {
+    Conversation conversation = this.checkConversationOwnership(conversationId, userId);
+
+    conversation.setName(updateConversationRequest.getName());
+
+    conversationRepository.save(conversation);
+
+    return conversationMapper.toConversationInfoResponse(
+        conversation, fileMapper.toFileInfoResponse(conversation.getFile()));
   }
 }
