@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class MessageServiceImpl implements MessageService {
 
   private final MessageRepository messageRepository;
@@ -41,49 +42,20 @@ public class MessageServiceImpl implements MessageService {
   private final MessageMapper messageMapper;
 
   @Override
-  @Transactional
   public MessageInfoResponse sendMessage(
-      UUID userId, UUID conversationId, CreateMessageRequest createMessageRequest) {
+      UUID userId, UUID conversationId, CreateMessageRequest request) {
     Conversation conversation =
         conversationService.checkConversationOwnership(conversationId, userId);
 
-    Message newMessage = new Message();
-
-    newMessage.setContent(createMessageRequest.getContent());
-    newMessage.setSenderType(SenderType.USER);
-    newMessage.setConversation(conversation);
-
-    MessageInfoResponse messageInfoResponse =
-        messageMapper.toMessageInfoResponse(messageRepository.save(newMessage), conversationId);
-
-    rabbitMQAdapter.pushMessageToQueue(
-        RabbitMQConfig.DIRECT_EXCHANGE_NAME, userId.toString(), messageInfoResponse);
+    MessageInfoResponse response =
+        saveAndPublishMessage(
+            conversation, request.getContent(), SenderType.USER, userId.toString());
 
     CompletableFuture<String> aiResponseFuture =
-        aiService.sendMessage(createMessageRequest.getContent(), userId);
-    aiResponseFuture
-        .thenAccept(
-            aiResponse -> {
-              Message aiMessage = new Message();
+        aiService.sendMessage(request.getContent(), userId);
+    processAIResponse(aiResponseFuture, conversation, userId.toString());
 
-              aiMessage.setContent(aiResponse);
-              aiMessage.setSenderType(SenderType.BOT);
-              aiMessage.setConversation(conversation);
-
-              MessageInfoResponse aiMessageInfoResponse =
-                  messageMapper.toMessageInfoResponse(
-                      messageRepository.save(aiMessage), conversationId);
-
-              rabbitMQAdapter.pushMessageToQueue(
-                  RabbitMQConfig.DIRECT_EXCHANGE_NAME, userId.toString(), aiMessageInfoResponse);
-            })
-        .exceptionally(
-            throwable -> {
-              log.error("Failed to process AI response: {}", throwable.getMessage());
-              return null;
-            });
-
-    return messageInfoResponse;
+    return response;
   }
 
   @Override
@@ -106,5 +78,57 @@ public class MessageServiceImpl implements MessageService {
         new PageInfo(pageable.getPageNumber() + 1, page.getTotalPages(), page.getTotalElements());
 
     return ResponseDataAPI.success(data, pageInfo);
+  }
+
+  @Override
+  public MessageInfoResponse summarizeEbook(
+      UUID userId, UUID conversationId, CreateMessageRequest request) {
+    Conversation conversation =
+        conversationService.checkConversationOwnership(conversationId, userId);
+
+    MessageInfoResponse response =
+        saveAndPublishMessage(
+            conversation, request.getContent(), SenderType.USER, userId.toString());
+
+    CompletableFuture<String> aiResponseFuture = aiService.summarizeEbook(conversationId, userId);
+    processAIResponse(aiResponseFuture, conversation, userId.toString());
+
+    return response;
+  }
+
+  private MessageInfoResponse saveAndPublishMessage(
+      Conversation conversation,
+      String content,
+      SenderType senderType,
+      String queueRoutingKey) {
+    Message message = new Message();
+
+    message.setContent(content);
+    message.setSenderType(senderType);
+    message.setConversation(conversation);
+
+    MessageInfoResponse response =
+        messageMapper.toMessageInfoResponse(messageRepository.save(message), conversation.getId());
+
+    rabbitMQAdapter.pushMessageToQueue(
+        RabbitMQConfig.DIRECT_EXCHANGE_NAME, queueRoutingKey, response);
+
+    return response;
+  }
+
+  private void processAIResponse(
+      CompletableFuture<String> aiResponseFuture,
+      Conversation conversation,
+      String queueRoutingKey) {
+    aiResponseFuture
+        .thenAccept(
+            aiResponse ->
+                saveAndPublishMessage(
+                    conversation, aiResponse, SenderType.BOT, queueRoutingKey))
+        .exceptionally(
+            throwable -> {
+              log.error("Failed to process AI response: {}", throwable.getMessage());
+              return null;
+            });
   }
 }
