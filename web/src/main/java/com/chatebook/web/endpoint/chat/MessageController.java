@@ -45,4 +45,14 @@ public class MessageController {
     return messageService.getListMessageByConversationId(
         pageable, userPrincipal.getId(), conversationId);
   }
+
+  @PostMapping("/{conversationId}/ebooks/summarize")
+  @PreAuthorize("hasRole('USER')")
+  public ResponseDataAPI summarizeEbook(
+      @CurrentUser UserPrincipal userPrincipal,
+      @RequestBody @Valid CreateMessageRequest createMessageRequest,
+      @PathVariable UUID conversationId) {
+    return ResponseDataAPI.successWithoutMeta(
+        messageService.summarizeEbook(userPrincipal.getId(), conversationId, createMessageRequest));
+  }
 }

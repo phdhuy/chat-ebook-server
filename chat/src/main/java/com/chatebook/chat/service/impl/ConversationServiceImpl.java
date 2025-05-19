@@ -49,11 +49,11 @@ public class ConversationServiceImpl implements ConversationService {
     conversation.setName(file.getOriginalFilename());
     conversation.setUser(userRepository.getReferenceById(userId));
 
-    aiService.uploadFile(file);
+    conversationRepository.save(conversation);
+    aiService.uploadFile(file, conversation.getId());
 
     return conversationMapper.toConversationInfoResponse(
-        conversationRepository.save(conversation),
-        fileMapper.toFileInfoResponse(conversation.getFile()));
+        conversation, fileMapper.toFileInfoResponse(conversation.getFile()));
   }
 
   @Override

@@ -13,4 +13,6 @@ public interface MessageService {
 
   ResponseDataAPI getListMessageByConversationId(
       Pageable pageable, UUID userId, UUID conversationId);
+
+  MessageInfoResponse summarizeEbook(UUID userId, UUID conversationId, CreateMessageRequest createMessageRequest);
 }
