@@ -5,6 +5,7 @@ import com.chatebook.common.ai.payload.request.SummarizeEbookRequest;
 import com.chatebook.common.ai.payload.response.QueryAIResponse;
 import com.chatebook.common.ai.payload.response.SummarizeEbookResponse;
 import com.chatebook.common.ai.service.AIService;
+import com.chatebook.common.constant.CommonConstant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.UUID;
@@ -25,15 +26,11 @@ public class AIServiceImpl implements AIService {
 
   private final ObjectMapper objectMapper;
 
-  private static final String AI_BASE_URL = "http://rag-ai:5000";
-
   @Override
   @Async("asyncExecutor")
   public void uploadFile(MultipartFile file, UUID conversationId) {
     try {
-      MediaType pdfMediaType = MediaType.parse("application/pdf");
-      RequestBody fileBody = RequestBody.create(file.getBytes(), pdfMediaType);
-
+      RequestBody fileBody = RequestBody.create(file.getBytes(), CommonConstant.PDF_MEDIA_TYPE);
       MultipartBody multipartBody =
           new MultipartBody.Builder()
               .setType(MultipartBody.FORM)
@@ -41,20 +38,10 @@ public class AIServiceImpl implements AIService {
               .addFormDataPart("conversation_id", conversationId.toString())
               .build();
 
-      Request httpRequest =
-          new Request.Builder()
-              .url(AI_BASE_URL + "/upload")
-              .post(multipartBody)
-              .addHeader("Accept", "application/json")
-              .build();
-
-      Response response = okHttpClient.newCall(httpRequest).execute();
-      if (!response.isSuccessful() && response.body() != null) {
-        String responseBody = response.body().string();
-        throw new IOException("Upload failed: HTTP " + response.code() + " - " + responseBody);
-      }
+      Request request = buildRequest("/upload", multipartBody);
+      executeRequest(request, "File upload failed");
     } catch (IOException e) {
-      log.error(e.getMessage());
+      log.error("Failed to upload file for conversation {}: {}", conversationId, e.getMessage());
     }
   }
 
@@ -64,33 +51,13 @@ public class AIServiceImpl implements AIService {
     try {
       String json =
           objectMapper.writeValueAsString(SendMessageToAIRequest.builder().query(content).build());
-      RequestBody body =
-          RequestBody.create(json, MediaType.parse("application/json; charset=utf-8"));
+      RequestBody body = RequestBody.create(json, CommonConstant.JSON_MEDIA_TYPE);
+      Request request = buildRequest("/query", body);
 
-      Request httpRequest =
-          new Request.Builder()
-              .url(AI_BASE_URL + "/query")
-              .post(body)
-              .addHeader("Accept", "application/json")
-              .build();
-
-      try (Response response = okHttpClient.newCall(httpRequest).execute()) {
-        if (response.isSuccessful() && response.body() != null) {
-          String responseBody = response.body().string();
-          QueryAIResponse queryAIResponse =
-              objectMapper.readValue(responseBody, QueryAIResponse.class);
-          String answer = queryAIResponse.getAnswer();
-          log.info("AI response received for user {}: {}", userId, answer);
-          return CompletableFuture.completedFuture(answer);
-        } else {
-          throw new IOException("AI service failed: HTTP " + response.code());
-        }
-      }
+      return executeRequestForResponse(request, QueryAIResponse.class, userId)
+          .thenApply(QueryAIResponse::getAnswer);
     } catch (IOException e) {
       log.error("Error sending message to AI service for user {}: {}", userId, e.getMessage());
-      return CompletableFuture.failedFuture(e);
-    } catch (Exception e) {
-      log.error("Unexpected error in AI service communication: {}", e.getMessage());
       return CompletableFuture.failedFuture(e);
     }
   }
@@ -100,34 +67,54 @@ public class AIServiceImpl implements AIService {
   public CompletableFuture<String> summarizeEbook(UUID conversationId, UUID userId) {
     try {
       String json =
-          objectMapper.writeValueAsString(SummarizeEbookRequest.builder().conversationId(conversationId.toString()).build());
-      RequestBody body =
-          RequestBody.create(json, MediaType.parse("application/json; charset=utf-8"));
+          objectMapper.writeValueAsString(
+              SummarizeEbookRequest.builder().conversationId(conversationId.toString()).build());
+      RequestBody body = RequestBody.create(json, CommonConstant.JSON_MEDIA_TYPE);
+      Request request = buildRequest("/summarize", body);
 
-      Request httpRequest =
-          new Request.Builder()
-              .url(AI_BASE_URL + "/summarize")
-              .post(body)
-              .addHeader("Accept", "application/json")
-              .build();
-
-      try (Response response = okHttpClient.newCall(httpRequest).execute()) {
-        if (response.isSuccessful() && response.body() != null) {
-          String responseBody = response.body().string();
-          SummarizeEbookResponse summarizeEbookResponse =
-              objectMapper.readValue(responseBody, SummarizeEbookResponse.class);
-          String summary = summarizeEbookResponse.getSummary();
-          return CompletableFuture.completedFuture(summary);
-        } else {
-          throw new IOException("AI service failed: HTTP " + response.code());
-        }
-      }
+      return executeRequestForResponse(request, SummarizeEbookResponse.class, userId)
+          .thenApply(SummarizeEbookResponse::getSummary);
     } catch (IOException e) {
-      log.error("Error sending message to AI service for user {}: {}", userId, e.getMessage());
-      return CompletableFuture.failedFuture(e);
-    } catch (Exception e) {
-      log.error("Unexpected error in AI service communication: {}", e.getMessage());
+      log.error("Error summarizing ebook for user {}: {}", userId, e.getMessage());
       return CompletableFuture.failedFuture(e);
     }
+  }
+
+  private Request buildRequest(String endpoint, RequestBody body) {
+    return new Request.Builder()
+        .url(CommonConstant.AI_BASE_URL + endpoint)
+        .post(body)
+        .addHeader("Accept", "application/json")
+        .build();
+  }
+
+  private void executeRequest(Request request, String errorMessage) throws IOException {
+    try (Response response = okHttpClient.newCall(request).execute()) {
+      if (!response.isSuccessful()) {
+        String responseBody =
+            response.body() != null ? response.body().string() : "No response body";
+        throw new IOException(
+            String.format("%s: HTTP %d - %s", errorMessage, response.code(), responseBody));
+      }
+    }
+  }
+
+  private <T> CompletableFuture<T> executeRequestForResponse(
+      Request request, Class<T> responseType, UUID userId) {
+    return CompletableFuture.supplyAsync(
+        () -> {
+          try (Response response = okHttpClient.newCall(request).execute()) {
+            if (response.isSuccessful() && response.body() != null) {
+              String responseBody = response.body().string();
+              T result = objectMapper.readValue(responseBody, responseType);
+              log.info("AI response received for user {}: {}", userId, result);
+              return result;
+            } else {
+              throw new IOException("AI service failed: HTTP " + response.code());
+            }
+          } catch (IOException e) {
+            throw new RuntimeException("Failed to process AI response for user " + userId, e);
+          }
+        });
   }
 }

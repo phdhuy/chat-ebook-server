@@ -1,5 +1,7 @@
 package com.chatebook.common.constant;
 
+import okhttp3.MediaType;
+
 public final class CommonConstant {
 
   private CommonConstant() {}
@@ -9,8 +11,6 @@ public final class CommonConstant {
   public static final String FAILURE = "failure";
 
   public static final String ROLE_PREFIX = "ROLE_";
-
-  public static final String RULE_ROLE = "ADMIN|TEACHER|STUDENT|PARENT";
 
   public static final String RULE_PASSWORD = "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,32})";
 
@@ -24,4 +24,11 @@ public final class CommonConstant {
 
   public static final String GOOGLE_AUTH_URL =
       "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
+
+  public static final MediaType JSON_MEDIA_TYPE =
+      MediaType.parse("application/json; charset=utf-8");
+
+  public static final MediaType PDF_MEDIA_TYPE = MediaType.parse("application/pdf");
+
+  public static final String AI_BASE_URL = "http://rag-ai:5000";
 }
