@@ -47,10 +47,12 @@ public class AIServiceImpl implements AIService {
 
   @Override
   @Async("asyncExecutor")
-  public CompletableFuture<String> sendMessage(String content, UUID userId) {
+  public CompletableFuture<String> sendMessage(
+      String content, String historyConversation, UUID userId) {
     try {
       String json =
-          objectMapper.writeValueAsString(SendMessageToAIRequest.builder().query(content).build());
+          objectMapper.writeValueAsString(
+              SendMessageToAIRequest.builder().query(content).history(historyConversation).build());
       RequestBody body = RequestBody.create(json, CommonConstant.JSON_MEDIA_TYPE);
       Request request = buildRequest("/query", body);
 
