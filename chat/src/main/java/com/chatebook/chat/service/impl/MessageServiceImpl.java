@@ -13,11 +13,14 @@ import com.chatebook.common.ai.service.AIService;
 import com.chatebook.common.config.RabbitMQConfig;
 import com.chatebook.common.payload.general.PageInfo;
 import com.chatebook.common.payload.general.ResponseDataAPI;
+import com.chatebook.common.utils.PagingUtils;
 import com.chatebook.common.utils.RabbitMQAdapter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -52,7 +55,10 @@ public class MessageServiceImpl implements MessageService {
             conversation, request.getContent(), SenderType.USER, userId.toString());
 
     CompletableFuture<String> aiResponseFuture =
-        aiService.sendMessage(request.getContent(), userId);
+        aiService.sendMessage(
+            request.getContent(),
+            this.getListMessageRecentlyAndFormatToString(userId, conversationId),
+            userId);
     processAIResponse(aiResponseFuture, conversation, userId.toString());
 
     return response;
@@ -97,10 +103,7 @@ public class MessageServiceImpl implements MessageService {
   }
 
   private MessageInfoResponse saveAndPublishMessage(
-      Conversation conversation,
-      String content,
-      SenderType senderType,
-      String queueRoutingKey) {
+      Conversation conversation, String content, SenderType senderType, String queueRoutingKey) {
     Message message = new Message();
 
     message.setContent(content);
@@ -123,12 +126,37 @@ public class MessageServiceImpl implements MessageService {
     aiResponseFuture
         .thenAccept(
             aiResponse ->
-                saveAndPublishMessage(
-                    conversation, aiResponse, SenderType.BOT, queueRoutingKey))
+                saveAndPublishMessage(conversation, aiResponse, SenderType.BOT, queueRoutingKey))
         .exceptionally(
             throwable -> {
               log.error("Failed to process AI response: {}", throwable.getMessage());
               return null;
             });
+  }
+
+  private String getListMessageRecentlyAndFormatToString(UUID userId, UUID conversationId) {
+    Conversation conversation =
+        conversationService.checkConversationOwnership(conversationId, userId);
+
+    Page<Message> page =
+        messageRepository.findAllByConversationId(
+            PagingUtils.makePageRequestWithCamelCase("id", "desc", 1, 5), conversation.getId());
+
+    List<MessageInfoResponse> data =
+        new java.util.ArrayList<>(
+            page.stream()
+                .map(msg -> messageMapper.toMessageInfoResponse(msg, conversationId))
+                .toList());
+
+    Collections.reverse(data);
+
+    return data.stream()
+        .map(
+            msg ->
+                (Objects.equals(msg.getSenderType(), SenderType.USER.toString())
+                        ? "User: "
+                        : "Assistant: ")
+                    + msg.getContent())
+        .collect(Collectors.joining("\n"));
   }
 }

@@ -8,7 +8,7 @@ public interface AIService {
 
   void uploadFile(MultipartFile file, UUID conversationId);
 
-  CompletableFuture<String> sendMessage(String content, UUID userId);
+  CompletableFuture<String> sendMessage(String content, String historyConversation, UUID userId);
 
   CompletableFuture<String> summarizeEbook(UUID conversationId, UUID userId);
 }
