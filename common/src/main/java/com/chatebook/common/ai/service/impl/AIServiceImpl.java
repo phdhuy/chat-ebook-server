@@ -27,7 +27,6 @@ public class AIServiceImpl implements AIService {
   private final ObjectMapper objectMapper;
 
   @Override
-  @Async("asyncExecutor")
   public void uploadFile(MultipartFile file, UUID conversationId) {
     try {
       RequestBody fileBody = RequestBody.create(file.getBytes(), CommonConstant.PDF_MEDIA_TYPE);
