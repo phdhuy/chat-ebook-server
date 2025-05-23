@@ -31,4 +31,6 @@ public final class CommonConstant {
   public static final MediaType PDF_MEDIA_TYPE = MediaType.parse("application/pdf");
 
   public static final String AI_BASE_URL = "http://rag-ai:5000";
+
+  public static final long RABBITMQ_TTL = 172800000;
 }
