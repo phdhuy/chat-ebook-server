@@ -15,7 +15,5 @@ public class QueryAIResponse {
 
   private String answer;
 
-  private List<String> ids;
-
-  private List<String> matchedChunks;
+  private List<String> citedExcerpts;
 }

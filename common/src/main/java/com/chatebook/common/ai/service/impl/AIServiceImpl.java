@@ -108,7 +108,7 @@ public class AIServiceImpl implements AIService {
             if (response.isSuccessful() && response.body() != null) {
               String responseBody = response.body().string();
               T result = objectMapper.readValue(responseBody, responseType);
-              log.info("AI response received for user {}: {}", userId, result);
+              log.info("Deserialized result for user {}: {}", userId, objectMapper.writeValueAsString(result));
               return result;
             } else {
               throw new IOException("AI service failed: HTTP " + response.code());

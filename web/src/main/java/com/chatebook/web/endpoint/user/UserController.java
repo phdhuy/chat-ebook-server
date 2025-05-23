@@ -2,6 +2,7 @@ package com.chatebook.web.endpoint.user;
 
 import com.chatebook.common.common.CommonFunction;
 import com.chatebook.common.config.RabbitMQConfig;
+import com.chatebook.common.constant.CommonConstant;
 import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.common.payload.response.QueueNameResponse;
 import com.chatebook.security.annotation.CurrentUser;
@@ -12,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +37,9 @@ public class UserController {
   @PreAuthorize("hasRole('USER')")
   public ResponseDataAPI createQueue(@CurrentUser UserPrincipal userPrincipal) {
     String queueName = CommonFunction.generateQueueName(userPrincipal.getId());
-    Queue queue = new Queue(queueName, true, false, true);
+    Map<String, Object> args = new HashMap<>();
+    args.put("x-expires", CommonConstant.RABBITMQ_TTL);
+    Queue queue = new Queue(queueName, true, false, false, args);
     amqpAdmin.declareQueue(queue);
 
     Binding binding =
