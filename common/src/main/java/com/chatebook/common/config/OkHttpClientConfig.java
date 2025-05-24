@@ -13,9 +13,9 @@ public class OkHttpClientConfig {
   @Bean
   public OkHttpClient okHttpClient() {
     return new OkHttpClient.Builder()
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(120, TimeUnit.SECONDS)
+        .writeTimeout(120, TimeUnit.SECONDS)
         .retryOnConnectionFailure(true)
         .build();
   }
