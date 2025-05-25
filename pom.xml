@@ -28,6 +28,7 @@
         <module>mail</module>
         <module>security</module>
         <module>chat</module>
+        <module>ai</module>
     </modules>
     <scm>
         <connection/>

@@ -1,8 +1,8 @@
-package com.chatebook.common.ai.payload.response;
+package com.chatebook.ai.payload.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import java.util.List;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,9 +11,13 @@ import lombok.Setter;
 @Setter
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SummarizeEbookResponse {
+public class UploadFileAIResponse {
 
-  private String summary;
+  private String message;
 
-  private List<String> citedPages;
+  private Long chunks;
+
+  private UUID conversationId;
+
+  private String answer;
 }

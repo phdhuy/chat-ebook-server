@@ -1,4 +1,4 @@
-package com.chatebook.common.ai.payload.request;
+package com.chatebook.ai.payload.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -10,7 +10,9 @@ import lombok.Setter;
 @Setter
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SummarizeEbookRequest {
+public class SendMessageToAIRequest {
 
-  private String conversationId;
+  private String query;
+
+  private String history;
 }
