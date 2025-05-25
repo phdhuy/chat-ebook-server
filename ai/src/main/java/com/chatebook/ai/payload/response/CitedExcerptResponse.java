@@ -2,7 +2,6 @@ package com.chatebook.ai.payload.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,9 +10,13 @@ import lombok.Setter;
 @Setter
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class QueryAIResponse {
+public class CitedExcerptResponse {
 
-  private String answer;
+  private Integer id;
 
-  private List<CitedExcerptResponse> citedExcerpts;
+  private String text;
+
+  private Integer page;
+
+  private Double score;
 }
