@@ -1,10 +1,11 @@
-package com.chatebook.common.ai.service.impl;
+package com.chatebook.ai.service.impl;
 
-import com.chatebook.common.ai.payload.request.SendMessageToAIRequest;
-import com.chatebook.common.ai.payload.request.SummarizeEbookRequest;
-import com.chatebook.common.ai.payload.response.QueryAIResponse;
-import com.chatebook.common.ai.payload.response.SummarizeEbookResponse;
-import com.chatebook.common.ai.service.AIService;
+import com.chatebook.ai.payload.request.SendMessageToAIRequest;
+import com.chatebook.ai.payload.request.SummarizeEbookRequest;
+import com.chatebook.ai.payload.response.QueryAIResponse;
+import com.chatebook.ai.payload.response.SummarizeEbookResponse;
+import com.chatebook.ai.payload.response.UploadFileAIResponse;
+import com.chatebook.ai.service.AIService;
 import com.chatebook.common.constant.CommonConstant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -27,7 +28,8 @@ public class AIServiceImpl implements AIService {
   private final ObjectMapper objectMapper;
 
   @Override
-  public void uploadFile(MultipartFile file, UUID conversationId) {
+  public UploadFileAIResponse uploadFile(MultipartFile file, UUID conversationId)
+      throws IOException {
     try {
       RequestBody fileBody = RequestBody.create(file.getBytes(), CommonConstant.PDF_MEDIA_TYPE);
       MultipartBody multipartBody =
@@ -38,9 +40,11 @@ public class AIServiceImpl implements AIService {
               .build();
 
       Request request = buildRequest("/upload", multipartBody);
-      executeRequest(request, "File upload failed");
+
+      return executeRequestForResponseSync(request);
     } catch (IOException e) {
       log.error("Failed to upload file for conversation {}: {}", conversationId, e.getMessage());
+      throw e;
     }
   }
 
@@ -55,7 +59,7 @@ public class AIServiceImpl implements AIService {
       RequestBody body = RequestBody.create(json, CommonConstant.JSON_MEDIA_TYPE);
       Request request = buildRequest("/query", body);
 
-      return executeRequestForResponse(request, QueryAIResponse.class, userId)
+      return executeRequestForResponse(request, QueryAIResponse.class)
           .thenApply(QueryAIResponse::getAnswer);
     } catch (IOException e) {
       log.error("Error sending message to AI service for user {}: {}", userId, e.getMessage());
@@ -73,7 +77,7 @@ public class AIServiceImpl implements AIService {
       RequestBody body = RequestBody.create(json, CommonConstant.JSON_MEDIA_TYPE);
       Request request = buildRequest("/summarize", body);
 
-      return executeRequestForResponse(request, SummarizeEbookResponse.class, userId)
+      return executeRequestForResponse(request, SummarizeEbookResponse.class)
           .thenApply(SummarizeEbookResponse::getSummary);
     } catch (IOException e) {
       log.error("Error summarizing ebook for user {}: {}", userId, e.getMessage());
@@ -89,33 +93,32 @@ public class AIServiceImpl implements AIService {
         .build();
   }
 
-  private void executeRequest(Request request, String errorMessage) throws IOException {
-    try (Response response = okHttpClient.newCall(request).execute()) {
-      if (!response.isSuccessful()) {
-        String responseBody =
-            response.body() != null ? response.body().string() : "No response body";
-        throw new IOException(
-            String.format("%s: HTTP %d - %s", errorMessage, response.code(), responseBody));
-      }
-    }
-  }
-
   private <T> CompletableFuture<T> executeRequestForResponse(
-      Request request, Class<T> responseType, UUID userId) {
+      Request request, Class<T> responseType) {
     return CompletableFuture.supplyAsync(
         () -> {
           try (Response response = okHttpClient.newCall(request).execute()) {
             if (response.isSuccessful() && response.body() != null) {
               String responseBody = response.body().string();
               T result = objectMapper.readValue(responseBody, responseType);
-              log.info("Deserialized result for user {}: {}", userId, objectMapper.writeValueAsString(result));
+              log.info("Deserialized result: {}", objectMapper.writeValueAsString(result));
               return result;
             } else {
               throw new IOException("AI service failed: HTTP " + response.code());
             }
           } catch (IOException e) {
-            throw new RuntimeException("Failed to process AI response for user " + userId, e);
+            throw new RuntimeException("Failed to process AI response for user " + e);
           }
         });
+  }
+
+  private UploadFileAIResponse executeRequestForResponseSync(Request request) throws IOException {
+    try (Response response = okHttpClient.newCall(request).execute()) {
+      if (!response.isSuccessful() || response.body() == null) {
+        throw new IOException("Unexpected code " + response);
+      }
+      String responseBody = response.body().string();
+      return objectMapper.readValue(responseBody, UploadFileAIResponse.class);
+    }
   }
 }

@@ -1,12 +1,15 @@
-package com.chatebook.common.ai.service;
+package com.chatebook.ai.service;
 
+import com.chatebook.ai.payload.response.UploadFileAIResponse;
+
+import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface AIService {
 
-  void uploadFile(MultipartFile file, UUID conversationId);
+  UploadFileAIResponse uploadFile(MultipartFile file, UUID conversationId) throws IOException;
 
   CompletableFuture<String> sendMessage(String content, String historyConversation, UUID userId);
 

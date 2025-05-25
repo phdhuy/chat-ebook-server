@@ -1,5 +1,7 @@
 package com.chatebook.chat.service.impl;
 
+import com.chatebook.ai.service.AIService;
+import com.chatebook.chat.event.ConversationCreatedEvent;
 import com.chatebook.chat.mapper.MessageMapper;
 import com.chatebook.chat.model.Conversation;
 import com.chatebook.chat.model.Message;
@@ -9,7 +11,6 @@ import com.chatebook.chat.payload.response.MessageInfoResponse;
 import com.chatebook.chat.repository.MessageRepository;
 import com.chatebook.chat.service.ConversationService;
 import com.chatebook.chat.service.MessageService;
-import com.chatebook.common.ai.service.AIService;
 import com.chatebook.common.config.RabbitMQConfig;
 import com.chatebook.common.payload.general.PageInfo;
 import com.chatebook.common.payload.general.ResponseDataAPI;
@@ -23,10 +24,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
 @RequiredArgsConstructor
@@ -100,6 +103,15 @@ public class MessageServiceImpl implements MessageService {
     processAIResponse(aiResponseFuture, conversation, userId.toString());
 
     return response;
+  }
+
+  @EventListener
+  public void handleConversationCreated(ConversationCreatedEvent event) {
+    saveAndPublishMessage(
+        event.getConversation(),
+        event.getUploadResponse().getAnswer(),
+        SenderType.BOT,
+        event.getUserId().toString());
   }
 
   private MessageInfoResponse saveAndPublishMessage(

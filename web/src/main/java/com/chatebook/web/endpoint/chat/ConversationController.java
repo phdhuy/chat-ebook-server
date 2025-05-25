@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+
+import java.io.IOException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +36,7 @@ public class ConversationController {
   public ResponseDataAPI createConversation(
       @CurrentUser UserPrincipal userPrincipal,
       @Parameter(description = "File to upload", required = true) @RequestPart("file")
-          MultipartFile file) {
+          MultipartFile file) throws IOException {
     return ResponseDataAPI.successWithoutMeta(
         conversationService.createConversation(userPrincipal.getId(), file));
   }
