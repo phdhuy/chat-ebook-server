@@ -50,7 +50,7 @@ public class AIServiceImpl implements AIService {
 
   @Override
   @Async("asyncExecutor")
-  public CompletableFuture<String> sendMessage(
+  public CompletableFuture<QueryAIResponse> sendMessage(
       String content, String historyConversation, UUID userId) {
     try {
       String json =
@@ -59,8 +59,7 @@ public class AIServiceImpl implements AIService {
       RequestBody body = RequestBody.create(json, CommonConstant.JSON_MEDIA_TYPE);
       Request request = buildRequest("/query", body);
 
-      return executeRequestForResponse(request, QueryAIResponse.class)
-          .thenApply(QueryAIResponse::getAnswer);
+      return executeRequestForResponse(request, QueryAIResponse.class);
     } catch (IOException e) {
       log.error("Error sending message to AI service for user {}: {}", userId, e.getMessage());
       return CompletableFuture.failedFuture(e);

@@ -1,5 +1,6 @@
 package com.chatebook.ai.service;
 
+import com.chatebook.ai.payload.response.QueryAIResponse;
 import com.chatebook.ai.payload.response.UploadFileAIResponse;
 
 import java.io.IOException;
@@ -11,7 +12,7 @@ public interface AIService {
 
   UploadFileAIResponse uploadFile(MultipartFile file, UUID conversationId) throws IOException;
 
-  CompletableFuture<String> sendMessage(String content, String historyConversation, UUID userId);
+  CompletableFuture<QueryAIResponse> sendMessage(String content, String historyConversation, UUID userId);
 
   CompletableFuture<String> summarizeEbook(UUID conversationId, UUID userId);
 }

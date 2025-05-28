@@ -1,8 +1,10 @@
 package com.chatebook.chat.service.impl;
 
+import com.chatebook.ai.payload.response.QueryAIResponse;
 import com.chatebook.ai.service.AIService;
 import com.chatebook.chat.event.ConversationCreatedEvent;
 import com.chatebook.chat.mapper.MessageMapper;
+import com.chatebook.chat.model.CitedExcerpt;
 import com.chatebook.chat.model.Conversation;
 import com.chatebook.chat.model.Message;
 import com.chatebook.chat.model.enums.SenderType;
@@ -56,12 +58,12 @@ public class MessageServiceImpl implements MessageService {
         saveAndPublishMessage(
             conversation, request.getContent(), SenderType.USER, userId.toString());
 
-    CompletableFuture<String> aiResponseFuture =
+    CompletableFuture<QueryAIResponse> aiResponseFuture =
         aiService.sendMessage(
             request.getContent(),
             this.getListMessageRecentlyAndFormatToString(userId, conversationId),
             userId);
-    processAIResponse(aiResponseFuture, conversation, userId.toString());
+    processQueryAIResponse(aiResponseFuture, conversation, userId.toString());
 
     return response;
   }
@@ -113,23 +115,6 @@ public class MessageServiceImpl implements MessageService {
         event.getUserId().toString());
   }
 
-  private MessageInfoResponse saveAndPublishMessage(
-      Conversation conversation, String content, SenderType senderType, String queueRoutingKey) {
-    Message message = new Message();
-
-    message.setContent(content);
-    message.setSenderType(senderType);
-    message.setConversation(conversation);
-
-    MessageInfoResponse response =
-        messageMapper.toMessageInfoResponse(messageRepository.save(message), conversation.getId());
-
-    rabbitMQAdapter.pushMessageToQueue(
-        RabbitMQConfig.DIRECT_EXCHANGE_NAME, queueRoutingKey, response);
-
-    return response;
-  }
-
   private void processAIResponse(
       CompletableFuture<String> aiResponseFuture,
       Conversation conversation,
@@ -143,6 +128,69 @@ public class MessageServiceImpl implements MessageService {
               log.error("Failed to process AI response: {}", throwable.getMessage());
               return null;
             });
+  }
+
+  private void processQueryAIResponse(
+      CompletableFuture<QueryAIResponse> aiResponseFuture,
+      Conversation conversation,
+      String queueRoutingKey) {
+    aiResponseFuture
+        .thenAccept(
+            aiResponse ->
+                saveAndPublishMessageCitedExcerpt(conversation, aiResponse, queueRoutingKey))
+        .exceptionally(
+            throwable -> {
+              log.error("Failed to process AI response: {}", throwable.getMessage());
+              return null;
+            });
+  }
+
+  private void saveAndPublishMessageCitedExcerpt(
+      Conversation conversation, QueryAIResponse content, String queueRoutingKey) {
+    Message message = new Message();
+
+    message.setContent(content.getAnswer());
+    message.setSenderType(SenderType.BOT);
+    message.setConversation(conversation);
+
+    List<CitedExcerpt> excerpts =
+        content.getCitedExcerpts().stream()
+            .map(
+                e ->
+                    CitedExcerpt.builder()
+                        .sourceId(e.getId())
+                        .page(e.getPage())
+                        .score(e.getScore())
+                        .text(e.getText())
+                        .message(message)
+                        .build())
+            .toList();
+
+    message.setCitedExcerpts(excerpts);
+
+    MessageInfoResponse response =
+        messageMapper.toMessageInfoResponse(messageRepository.save(message), conversation.getId());
+
+    rabbitMQAdapter.pushMessageToQueue(
+        RabbitMQConfig.DIRECT_EXCHANGE_NAME, queueRoutingKey, response);
+  }
+
+  private MessageInfoResponse saveAndPublishMessage(
+      Conversation conversation, String content, SenderType senderType, String queueRoutingKey) {
+    Message message = new Message();
+
+    message.setContent(content);
+    message.setSenderType(senderType);
+    message.setConversation(conversation);
+    message.setCitedExcerpts(List.of());
+
+    MessageInfoResponse response =
+        messageMapper.toMessageInfoResponse(messageRepository.save(message), conversation.getId());
+
+    rabbitMQAdapter.pushMessageToQueue(
+        RabbitMQConfig.DIRECT_EXCHANGE_NAME, queueRoutingKey, response);
+
+    return response;
   }
 
   private String getListMessageRecentlyAndFormatToString(UUID userId, UUID conversationId) {

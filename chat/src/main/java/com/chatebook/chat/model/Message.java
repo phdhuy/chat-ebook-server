@@ -3,6 +3,7 @@ package com.chatebook.chat.model;
 import com.chatebook.chat.model.enums.SenderType;
 import com.chatebook.common.model.AbstractEntity;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,4 +31,7 @@ public class Message extends AbstractEntity {
   @ManyToOne
   @JoinColumn(name = "converation_id")
   private Conversation conversation;
+
+  @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<CitedExcerpt> citedExcerpts;
 }
