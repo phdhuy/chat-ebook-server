@@ -12,6 +12,9 @@ import org.springframework.stereotype.Repository;
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
   @Query(
-      "SELECT m from messages m WHERE m.conversation.id = :conversationId and m.deletedAt is null")
+      value =
+          "SELECT DISTINCT m FROM messages m LEFT JOIN FETCH m.citedExcerpts WHERE m.conversation.id = :conversationId AND m.deletedAt IS NULL",
+      countQuery =
+          "SELECT COUNT(m) FROM messages m WHERE m.conversation.id = :conversationId AND m.deletedAt IS NULL")
   Page<Message> findAllByConversationId(Pageable pageable, UUID conversationId);
 }
