@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>com.chatebook</groupId>
-    <artifactId>web</artifactId>
+    <artifactId>mindmap</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -26,23 +26,7 @@
         </dependency>
         <dependency>
             <groupId>com.chatebook</groupId>
-            <artifactId>security</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.chatebook</groupId>
-            <artifactId>file</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.chatebook</groupId>
             <artifactId>chat</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.chatebook</groupId>
-            <artifactId>mindmap</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
@@ -53,13 +37,15 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
         </plugins>

@@ -2,6 +2,7 @@ package com.chatebook.ai.service.impl;
 
 import com.chatebook.ai.payload.request.SendMessageToAIRequest;
 import com.chatebook.ai.payload.request.SummarizeEbookRequest;
+import com.chatebook.ai.payload.response.GenerateMindMapResponse;
 import com.chatebook.ai.payload.response.QueryAIResponse;
 import com.chatebook.ai.payload.response.SummarizeEbookResponse;
 import com.chatebook.ai.payload.response.UploadFileAIResponse;
@@ -81,6 +82,40 @@ public class AIServiceImpl implements AIService {
     } catch (IOException e) {
       log.error("Error summarizing ebook for user {}: {}", userId, e.getMessage());
       return CompletableFuture.failedFuture(e);
+    }
+  }
+
+  @Override
+  public GenerateMindMapResponse generateMindMap(MultipartFile file, UUID conversationId) {
+    try {
+      RequestBody fileBody = RequestBody.create(file.getBytes(), CommonConstant.PDF_MEDIA_TYPE);
+      MultipartBody multipartBody =
+          new MultipartBody.Builder()
+              .setType(MultipartBody.FORM)
+              .addFormDataPart("file", file.getOriginalFilename(), fileBody)
+              .build();
+
+      Request request = buildRequest("/mindmap", multipartBody);
+
+      try (Response response = okHttpClient.newCall(request).execute()) {
+        if (response.isSuccessful() && response.body() != null) {
+          String responseJson = response.body().string();
+
+          return objectMapper.readValue(responseJson, GenerateMindMapResponse.class);
+        } else {
+          String message =
+              "AI service returned HTTP "
+                  + response.code()
+                  + " (body="
+                  + (response.body() == null ? "null" : response.body().string())
+                  + ")";
+          log.error("Failed to generate mind map for conversation {}: {}", conversationId, message);
+          throw new IOException(message);
+        }
+      }
+    } catch (IOException e) {
+      log.error("Error in generateMindMap for conversation {}: {}", conversationId, e.getMessage());
+      throw new RuntimeException("Unable to generate mind map", e);
     }
   }
 
