@@ -47,3 +47,8 @@ invalid_access_token_google:
 conversation_not_found:
   code: ERR.CONV0101
   message: Conversation was not found!
+
+#MindMap
+mindmap_not_found:
+  code: ERR.MINDMAP0101
+  message: MindMap was not found!

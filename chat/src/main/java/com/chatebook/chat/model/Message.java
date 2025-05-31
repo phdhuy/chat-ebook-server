@@ -29,7 +29,7 @@ public class Message extends AbstractEntity {
   private SenderType senderType;
 
   @ManyToOne
-  @JoinColumn(name = "converation_id")
+  @JoinColumn(name = "conversation_id")
   private Conversation conversation;
 
   @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)

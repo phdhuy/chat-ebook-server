@@ -44,4 +44,7 @@ public final class MessageConstant {
 
   // Conversation
   public static final String CONVERSATION_NOT_FOUND = "conversation_not_found";
+
+  // MindMap
+  public static final String MINDMAP_NOT_FOUND = "mindmap_not_found";
 }

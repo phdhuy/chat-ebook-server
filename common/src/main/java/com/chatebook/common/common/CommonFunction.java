@@ -3,6 +3,9 @@ package com.chatebook.common.common;
 import com.chatebook.common.constant.CommonConstant;
 import com.chatebook.common.payload.response.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -11,6 +14,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 public final class CommonFunction {
@@ -136,5 +141,14 @@ public final class CommonFunction {
       sb.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
     }
     return sb.toString();
+  }
+
+  public static MultipartFile convertUrlToMultipartFile(String fileUrl, String fileName)
+      throws IOException {
+    URL url = new URL(fileUrl);
+    try (InputStream inputStream = url.openStream()) {
+      byte[] fileBytes = inputStream.readAllBytes();
+      return new MockMultipartFile("file", fileName, "application/octet-stream", fileBytes);
+    }
   }
 }
