@@ -5,6 +5,8 @@ import com.chatebook.common.constant.MessageConstant;
 import com.chatebook.common.exception.BadRequestException;
 import com.chatebook.common.exception.NotFoundException;
 import com.chatebook.common.model.enums.Role;
+import com.chatebook.common.payload.general.PageInfo;
+import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.security.mapper.UserMapper;
 import com.chatebook.security.model.User;
 import com.chatebook.security.payload.request.SignUpRequest;
@@ -13,6 +15,8 @@ import com.chatebook.security.repository.UserRepository;
 import com.chatebook.security.service.UserService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +52,17 @@ public class UserServiceImpl implements UserService {
   public UserInfoResponse getMyInfo(UUID userId) {
     User user = this.findUserById(userId);
     return userMapper.toUserInfoResponse(user);
+  }
+
+  @Override
+  public ResponseDataAPI getListUserByAdmin(Pageable pageable) {
+    Page<User> users = userRepository.getListUser(pageable);
+
+    PageInfo pageInfo =
+        new PageInfo(pageable.getPageNumber() + 1, users.getTotalPages(), users.getTotalElements());
+
+    return ResponseDataAPI.success(
+        users.stream().map(userMapper::toUserInfoResponse), pageInfo);
   }
 
   @Override

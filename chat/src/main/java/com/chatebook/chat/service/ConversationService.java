@@ -26,4 +26,6 @@ public interface ConversationService {
 
   ConversationInfoResponse updateInfoConversation(
       UUID userId, UUID conversationId, UpdateConversationRequest updateConversationRequest);
+
+  ResponseDataAPI getListConversationByAdmin(Pageable pageable);
 }

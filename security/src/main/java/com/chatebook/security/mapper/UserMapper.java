@@ -12,6 +12,7 @@ public interface UserMapper {
   @Mapping(source = "user.id", target = "id")
   @Mapping(source = "user.email", target = "email")
   @Mapping(source = "user.confirmedAt", target = "confirmedAt")
+  @Mapping(source = "user.deletedAt", target = "deletedAt")
   @Mapping(source = "user.createdAt", target = "createdAt")
   @Mapping(source = "user.isConfirmed", target = "isConfirmed")
   @Mapping(source = "user.username", target = "username")

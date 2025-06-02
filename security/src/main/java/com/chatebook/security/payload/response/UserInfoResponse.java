@@ -22,6 +22,8 @@ public class UserInfoResponse {
 
   private Timestamp createdAt;
 
+  private Timestamp deletedAt;
+
   private Timestamp confirmedAt;
 
   private Boolean isConfirmed;

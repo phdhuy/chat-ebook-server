@@ -32,9 +32,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ConversationServiceImpl implements ConversationService {
 
-  private final UserRepository userRepository;
-
   private final ConversationRepository conversationRepository;
+
+  private final UserRepository userRepository;
 
   private final FileService fileService;
 
@@ -133,5 +133,24 @@ public class ConversationServiceImpl implements ConversationService {
 
     return conversationMapper.toConversationInfoResponse(
         conversation, fileMapper.toFileInfoResponse(conversation.getFile()));
+  }
+
+  @Override
+  public ResponseDataAPI getListConversationByAdmin(Pageable pageable) {
+    Page<Conversation> conversations = conversationRepository.getListConversationByAdmin(pageable);
+
+    PageInfo pageInfo =
+        new PageInfo(
+            pageable.getPageNumber() + 1,
+            conversations.getTotalPages(),
+            conversations.getTotalElements());
+
+    return ResponseDataAPI.success(
+        conversations.stream()
+            .map(
+                conversation ->
+                    conversationMapper.toConversationInfoResponse(
+                        conversation, fileMapper.toFileInfoResponse(conversation.getFile()))),
+        pageInfo);
   }
 }
