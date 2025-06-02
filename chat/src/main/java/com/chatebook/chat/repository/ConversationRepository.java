@@ -12,6 +12,10 @@ import org.springframework.stereotype.Repository;
 public interface ConversationRepository extends JpaRepository<Conversation, UUID> {
 
   @Query(
-      value = "SELECT c FROM conversations c WHERE c.user.id = :userId and c.deletedAt is null ORDER BY c.createdAt DESC")
+      value =
+          "SELECT c FROM conversations c WHERE c.user.id = :userId and c.deletedAt is null ORDER BY c.createdAt DESC")
   Page<Conversation> getMyConversations(Pageable pageable, UUID userId);
+
+  @Query(value = "SELECT c FROM conversations c")
+  Page<Conversation> getListConversationByAdmin(Pageable pageable);
 }
