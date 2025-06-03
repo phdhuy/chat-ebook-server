@@ -58,7 +58,8 @@ public class ConversationServiceImpl implements ConversationService {
 
     conversationRepository.save(conversation);
 
-    UploadFileAIResponse uploadFileAIResponse = aiService.uploadFile(file, conversation.getId());
+    UploadFileAIResponse uploadFileAIResponse =
+        aiService.uploadFile(file, conversation.getId(), userId);
 
     eventPublisher.publishEvent(
         new ConversationCreatedEvent(this, conversation, uploadFileAIResponse, userId));

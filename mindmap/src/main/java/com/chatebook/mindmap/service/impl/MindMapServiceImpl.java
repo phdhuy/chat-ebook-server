@@ -43,7 +43,8 @@ public class MindMapServiceImpl implements MindMapService {
           aiService.generateMindMap(
               CommonFunction.convertUrlToMultipartFile(
                   conversation.getFile().getSecureUrl(), conversation.getName()),
-              conversationId);
+              conversationId,
+              userId);
 
       JsonNode payload = objectMapper.valueToTree(mindMapResponse);
 

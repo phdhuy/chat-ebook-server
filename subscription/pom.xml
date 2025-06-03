@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>com.chatebook</groupId>
-    <artifactId>ai</artifactId>
+    <artifactId>subscription</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>com.chatebook</groupId>
-            <artifactId>subscription</artifactId>
+            <artifactId>security</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

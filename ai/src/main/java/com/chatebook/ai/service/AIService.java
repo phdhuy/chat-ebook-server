@@ -10,12 +10,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface AIService {
 
-  UploadFileAIResponse uploadFile(MultipartFile file, UUID conversationId) throws IOException;
+  UploadFileAIResponse uploadFile(MultipartFile file, UUID conversationId, UUID userId) throws IOException;
 
   CompletableFuture<QueryAIResponse> sendMessage(
       String content, String historyConversation, UUID userId);
 
   CompletableFuture<String> summarizeEbook(UUID conversationId, UUID userId);
 
-  GenerateMindMapResponse generateMindMap(MultipartFile file, UUID conversationId);
+  GenerateMindMapResponse generateMindMap(MultipartFile file, UUID conversationId, UUID userId);
 }
