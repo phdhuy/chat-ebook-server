@@ -11,6 +11,7 @@ COPY security/pom.xml ./security/
 COPY chat/pom.xml ./chat/
 COPY ai/pom.xml ./ai/
 COPY mindmap/pom.xml ./mindmap/
+COPY subscription/pom.xml ./subscription/
 
 RUN mvn dependency:go-offline -B
 

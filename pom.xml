@@ -30,6 +30,7 @@
         <module>chat</module>
         <module>ai</module>
         <module>mindmap</module>
+        <module>subscription</module>
     </modules>
     <scm>
         <connection/>
