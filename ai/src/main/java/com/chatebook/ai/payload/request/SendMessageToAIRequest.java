@@ -15,4 +15,6 @@ public class SendMessageToAIRequest {
   private String query;
 
   private String history;
+
+  private String conversationId;
 }

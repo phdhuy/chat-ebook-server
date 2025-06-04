@@ -62,7 +62,8 @@ public class MessageServiceImpl implements MessageService {
         aiService.sendMessage(
             request.getContent(),
             this.getListMessageRecentlyAndFormatToString(userId, conversationId),
-            userId);
+            userId,
+            conversationId);
     processQueryAIResponse(aiResponseFuture, conversation, userId.toString());
 
     return response;
@@ -199,7 +200,7 @@ public class MessageServiceImpl implements MessageService {
 
     Page<Message> page =
         messageRepository.findAllByConversationId(
-            PagingUtils.makePageRequestWithCamelCase("id", "desc", 1, 5), conversation.getId());
+            PagingUtils.makePageRequestWithCamelCase("id", "desc", 1, 3), conversation.getId());
 
     List<MessageInfoResponse> data =
         new java.util.ArrayList<>(

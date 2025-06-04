@@ -13,7 +13,7 @@ public interface AIService {
   UploadFileAIResponse uploadFile(MultipartFile file, UUID conversationId, UUID userId) throws IOException;
 
   CompletableFuture<QueryAIResponse> sendMessage(
-      String content, String historyConversation, UUID userId);
+      String content, String historyConversation, UUID userId, UUID conversationId);
 
   CompletableFuture<String> summarizeEbook(UUID conversationId, UUID userId);
 

@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -62,11 +61,15 @@ public class AIServiceImpl implements AIService {
   @Override
   @Async("asyncExecutor")
   public CompletableFuture<QueryAIResponse> sendMessage(
-      String content, String historyConversation, UUID userId) {
+      String content, String historyConversation, UUID userId, UUID conversationId) {
     try {
       String json =
           objectMapper.writeValueAsString(
-              SendMessageToAIRequest.builder().query(content).history(historyConversation).build());
+              SendMessageToAIRequest.builder()
+                  .query(content)
+                  .history(historyConversation)
+                  .conversationId(conversationId.toString())
+                  .build());
       RequestBody body = RequestBody.create(json, CommonConstant.JSON_MEDIA_TYPE);
       Request request = buildRequest("/query", body);
 
