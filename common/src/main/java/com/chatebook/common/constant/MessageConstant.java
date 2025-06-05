@@ -47,4 +47,7 @@ public final class MessageConstant {
 
   // MindMap
   public static final String MINDMAP_NOT_FOUND = "mindmap_not_found";
+
+  // Usage
+  public static final String FROM_DATE_MUST_BE_BEFORE_TO_DATE = "from_date_must_be_before_to_date";
 }
