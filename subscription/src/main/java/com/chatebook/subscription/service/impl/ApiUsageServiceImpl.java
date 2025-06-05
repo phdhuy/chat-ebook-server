@@ -1,5 +1,7 @@
 package com.chatebook.subscription.service.impl;
 
+import com.chatebook.common.constant.MessageConstant;
+import com.chatebook.common.exception.BadRequestException;
 import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.security.repository.UserRepository;
 import com.chatebook.subscription.model.ApiUsage;
@@ -31,11 +33,15 @@ public class ApiUsageServiceImpl implements ApiUsageService {
   }
 
   @Override
-  public ResponseDataAPI countApiUsage(UUID userId, LocalDateTime start, LocalDateTime end, String requestStatus) {
-    String[] resourceTypes = Arrays.stream(ResourceType.values())
-            .map(Enum::name)
-            .toArray(String[]::new);
+  public ResponseDataAPI countApiUsage(
+      UUID userId, LocalDateTime start, LocalDateTime end, String requestStatus) {
+    if (start.isAfter(end)) {
+      throw new BadRequestException(MessageConstant.FROM_DATE_MUST_BE_BEFORE_TO_DATE);
+    }
+    String[] resourceTypes =
+        Arrays.stream(ResourceType.values()).map(Enum::name).toArray(String[]::new);
     return ResponseDataAPI.successWithoutMeta(
-        apiUsageRepository.countApiUsageByResourceType(userId, start, end, requestStatus, resourceTypes));
+        apiUsageRepository.countApiUsageByResourceType(
+            userId, start, end, requestStatus, resourceTypes));
   }
 }
