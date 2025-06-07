@@ -2,7 +2,6 @@ package com.chatebook.security.token;
 
 import com.chatebook.common.constant.MessageConstant;
 import com.chatebook.common.exception.ForbiddenException;
-import com.chatebook.common.model.enums.Role;
 import com.chatebook.security.config.TokenProperties;
 import com.chatebook.security.mapper.OauthTokenMapper;
 import com.chatebook.security.model.OauthToken;
@@ -10,17 +9,17 @@ import com.chatebook.security.model.User;
 import com.chatebook.security.model.UserPrincipal;
 import com.chatebook.security.payload.response.OauthTokenResponse;
 import com.chatebook.security.service.OauthTokenService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+
 import java.util.Date;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class TokenProvider {
 
   private final TokenProperties tokenProperties;
@@ -36,6 +35,7 @@ public class TokenProvider {
     return Jwts.builder()
         .setSubject(oauthToken.getId().toString())
         .setIssuedAt(new Date())
+        .claim("role", oauthToken.getUser().getRole().toString())
         .setExpiration(expiryDate)
         .signWith(SignatureAlgorithm.HS512, tokenProperties.getTokenSecret())
         .compact();
@@ -48,6 +48,7 @@ public class TokenProvider {
     return Jwts.builder()
         .setSubject(oauthToken.getRefreshToken().toString())
         .setIssuedAt(new Date())
+        .claim("role", oauthToken.getUser().getRole().toString())
         .setExpiration(expiryDate)
         .signWith(SignatureAlgorithm.HS512, tokenProperties.getRefreshTokenSecret())
         .compact();
@@ -106,16 +107,13 @@ public class TokenProvider {
     return this.createToken(userPrincipal.getId());
   }
 
-  public OauthTokenResponse refreshTokenOauthToken(String refreshToken, boolean isAdmin) {
+  public OauthTokenResponse refreshTokenOauthToken(String refreshToken) {
     this.validateRefreshToken(refreshToken, tokenProperties.getRefreshTokenSecret());
     UUID refreshTokenId =
         this.getUUIDFromToken(refreshToken, tokenProperties.getRefreshTokenSecret());
 
     OauthToken oauthToken = oauthTokenService.getOauthTokenByRefreshToken(refreshTokenId);
-    if (isAdmin && !oauthToken.getUser().getRole().equals(Role.ROLE_ADMIN)
-        || !isAdmin && oauthToken.getUser().getRole().equals(Role.ROLE_ADMIN)) {
-      throw new ForbiddenException(MessageConstant.FORBIDDEN_ERROR);
-    }
+
     OauthToken result = oauthTokenService.createToken(oauthToken.getUser().getId(), refreshTokenId);
     return oauthTokenMapper.toOauthTokenResponse(
         this.createAccessToken(result),
