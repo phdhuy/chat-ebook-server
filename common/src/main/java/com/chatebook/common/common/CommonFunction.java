@@ -1,6 +1,8 @@
 package com.chatebook.common.common;
 
 import com.chatebook.common.constant.CommonConstant;
+import com.chatebook.common.constant.MessageConstant;
+import com.chatebook.common.exception.FileUploadException;
 import com.chatebook.common.payload.response.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -143,12 +145,15 @@ public final class CommonFunction {
     return sb.toString();
   }
 
-  public static MultipartFile convertUrlToMultipartFile(String fileUrl, String fileName)
-      throws IOException {
-    URL url = new URL(fileUrl);
-    try (InputStream inputStream = url.openStream()) {
-      byte[] fileBytes = inputStream.readAllBytes();
-      return new MockMultipartFile("file", fileName, "application/octet-stream", fileBytes);
+  public static MultipartFile convertUrlToMultipartFile(String fileUrl, String fileName) {
+    try {
+      URL url = new URL(fileUrl);
+      try (InputStream inputStream = url.openStream()) {
+        byte[] fileBytes = inputStream.readAllBytes();
+        return new MockMultipartFile("file", fileName, "application/octet-stream", fileBytes);
+      }
+    } catch (IOException e) {
+      throw new FileUploadException(MessageConstant.UPLOAD_FILE_ERROR);
     }
   }
 }

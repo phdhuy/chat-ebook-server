@@ -1,5 +1,6 @@
 package com.chatebook.web.endpoint.chat;
 
+import com.chatebook.chat.payload.request.CreateConversationByURLRequest;
 import com.chatebook.chat.payload.request.UpdateConversationRequest;
 import com.chatebook.chat.service.ConversationService;
 import com.chatebook.common.payload.general.ResponseDataAPI;
@@ -10,8 +11,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
-import java.io.IOException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -36,9 +35,19 @@ public class ConversationController {
   public ResponseDataAPI createConversation(
       @CurrentUser UserPrincipal userPrincipal,
       @Parameter(description = "File to upload", required = true) @RequestPart("file")
-          MultipartFile file) throws IOException {
+          MultipartFile file) {
     return ResponseDataAPI.successWithoutMeta(
         conversationService.createConversation(userPrincipal.getId(), file));
+  }
+
+  @PostMapping("/url")
+  @PreAuthorize("hasRole('USER')")
+  public ResponseDataAPI createConversationByURL(
+      @CurrentUser UserPrincipal userPrincipal,
+      @Valid @RequestBody CreateConversationByURLRequest createConversationByURLRequest) {
+    return ResponseDataAPI.successWithoutMeta(
+        conversationService.createConversationByURL(
+            userPrincipal.getId(), createConversationByURLRequest));
   }
 
   @GetMapping

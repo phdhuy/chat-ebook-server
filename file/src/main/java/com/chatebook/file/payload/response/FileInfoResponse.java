@@ -21,6 +21,8 @@ public class FileInfoResponse {
 
   private String secureUrl;
 
+  private String fileName;
+
   private String publicId;
 
   private String format;

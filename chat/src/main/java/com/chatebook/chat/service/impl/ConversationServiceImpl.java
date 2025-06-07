@@ -5,6 +5,7 @@ import com.chatebook.ai.service.AIService;
 import com.chatebook.chat.event.ConversationCreatedEvent;
 import com.chatebook.chat.mapper.ConversationMapper;
 import com.chatebook.chat.model.Conversation;
+import com.chatebook.chat.payload.request.CreateConversationByURLRequest;
 import com.chatebook.chat.payload.request.UpdateConversationRequest;
 import com.chatebook.chat.payload.response.ConversationInfoResponse;
 import com.chatebook.chat.repository.ConversationRepository;
@@ -16,9 +17,9 @@ import com.chatebook.common.exception.NotFoundException;
 import com.chatebook.common.payload.general.PageInfo;
 import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.file.mapper.FileMapper;
+import com.chatebook.file.model.File;
 import com.chatebook.file.service.FileService;
 import com.chatebook.security.repository.UserRepository;
-import java.io.IOException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -48,8 +49,7 @@ public class ConversationServiceImpl implements ConversationService {
 
   @Override
   @Transactional
-  public ConversationInfoResponse createConversation(UUID userId, MultipartFile file)
-      throws IOException {
+  public ConversationInfoResponse createConversation(UUID userId, MultipartFile file) {
     Conversation conversation = new Conversation();
 
     conversation.setFile(fileService.saveInfoUploadFile(file));
@@ -60,6 +60,34 @@ public class ConversationServiceImpl implements ConversationService {
 
     UploadFileAIResponse uploadFileAIResponse =
         aiService.uploadFile(file, conversation.getId(), userId);
+
+    eventPublisher.publishEvent(
+        new ConversationCreatedEvent(this, conversation, uploadFileAIResponse, userId));
+
+    return conversationMapper.toConversationInfoResponse(
+        conversation, fileMapper.toFileInfoResponse(conversation.getFile()));
+  }
+
+  @Override
+  @Transactional
+  public ConversationInfoResponse createConversationByURL(
+      UUID userId, CreateConversationByURLRequest createConversationByURLRequest) {
+    File file = fileService.saveFileByURL(createConversationByURLRequest.getUrl());
+
+    Conversation conversation = new Conversation();
+
+    conversation.setFile(file);
+    conversation.setName(file.getFileName());
+    conversation.setUser(userRepository.getReferenceById(userId));
+
+    conversationRepository.save(conversation);
+
+    UploadFileAIResponse uploadFileAIResponse =
+        aiService.uploadFile(
+            CommonFunction.convertUrlToMultipartFile(
+                conversation.getFile().getSecureUrl(), conversation.getName()),
+            conversation.getId(),
+            userId);
 
     eventPublisher.publishEvent(
         new ConversationCreatedEvent(this, conversation, uploadFileAIResponse, userId));
