@@ -2,8 +2,6 @@ package com.chatebook.web.endpoint.auth;
 
 import com.chatebook.common.constant.MessageConstant;
 import com.chatebook.common.exception.BadRequestException;
-import com.chatebook.common.exception.UnauthorizedException;
-import com.chatebook.common.model.enums.Role;
 import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.security.model.UserPrincipal;
 import com.chatebook.security.payload.request.RefreshTokenRequest;
@@ -47,9 +45,6 @@ public class AuthController {
                   signInRequest.getEmail().toLowerCase(), signInRequest.getPassword()));
       SecurityContextHolder.getContext().setAuthentication(authentication);
       UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-      if (userPrincipal.getRole().equals(Role.ROLE_ADMIN)) {
-        throw new UnauthorizedException(MessageConstant.UNAUTHORIZED);
-      }
 
       return ResponseDataAPI.successWithoutMeta(tokenProvider.createOauthToken(userPrincipal));
 
@@ -81,7 +76,7 @@ public class AuthController {
   @PostMapping("/refresh-token")
   public ResponseDataAPI refreshToken(@RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
     return ResponseDataAPI.successWithoutMeta(
-        tokenProvider.refreshTokenOauthToken(refreshTokenRequest.getRefreshToken(), false));
+        tokenProvider.refreshTokenOauthToken(refreshTokenRequest.getRefreshToken()));
   }
 
   @PostMapping("/revoke-token")
