@@ -8,6 +8,9 @@ import com.chatebook.ai.payload.response.SummarizeEbookResponse;
 import com.chatebook.ai.payload.response.UploadFileAIResponse;
 import com.chatebook.ai.service.AIService;
 import com.chatebook.common.constant.CommonConstant;
+import com.chatebook.common.constant.MessageConstant;
+import com.chatebook.common.exception.AIServiceException;
+import com.chatebook.common.exception.FileUploadException;
 import com.chatebook.subscription.model.enums.RequestStatus;
 import com.chatebook.subscription.model.enums.ResourceType;
 import com.chatebook.subscription.service.ApiUsageService;
@@ -35,8 +38,7 @@ public class AIServiceImpl implements AIService {
   private final ObjectMapper objectMapper;
 
   @Override
-  public UploadFileAIResponse uploadFile(MultipartFile file, UUID conversationId, UUID userId)
-      throws IOException {
+  public UploadFileAIResponse uploadFile(MultipartFile file, UUID conversationId, UUID userId) {
     try {
       RequestBody fileBody = RequestBody.create(file.getBytes(), CommonConstant.PDF_MEDIA_TYPE);
       MultipartBody multipartBody =
@@ -54,7 +56,7 @@ public class AIServiceImpl implements AIService {
     } catch (IOException e) {
       log.error("Failed to upload file for conversation {}: {}", conversationId, e.getMessage());
       apiUsageService.save(ResourceType.UPLOAD_EBOOK, RequestStatus.FAILED, userId);
-      throw e;
+      throw new FileUploadException(MessageConstant.UPLOAD_FILE_ERROR);
     }
   }
 
@@ -92,7 +94,7 @@ public class AIServiceImpl implements AIService {
           userId,
           e.getMessage());
       apiUsageService.save(ResourceType.SEND_MESSAGE, RequestStatus.FAILED, userId);
-      return CompletableFuture.failedFuture(e);
+      throw new AIServiceException(MessageConstant.AI_SERVICE_ERROR);
     }
   }
 
@@ -122,7 +124,7 @@ public class AIServiceImpl implements AIService {
       log.error(
           "Error preparing request for summarizing ebook for user {}: {}", userId, e.getMessage());
       apiUsageService.save(ResourceType.SUMMARIZE_EBOOK, RequestStatus.FAILED, userId);
-      return CompletableFuture.failedFuture(e);
+      throw new AIServiceException(MessageConstant.AI_SERVICE_ERROR);
     }
   }
 
@@ -161,7 +163,7 @@ public class AIServiceImpl implements AIService {
     } catch (IOException e) {
       log.error("Error in generateMindMap for conversation {}: {}", conversationId, e.getMessage());
       apiUsageService.save(ResourceType.GENERATE_MIND_MAP, RequestStatus.FAILED, userId);
-      throw new RuntimeException("Unable to generate mind map", e);
+      throw new AIServiceException(MessageConstant.AI_SERVICE_ERROR);
     }
   }
 
@@ -187,7 +189,7 @@ public class AIServiceImpl implements AIService {
               throw new IOException("AI service failed: HTTP " + response.code());
             }
           } catch (IOException e) {
-            throw new RuntimeException("Failed to process AI response for user " + e);
+            throw new AIServiceException(MessageConstant.AI_SERVICE_ERROR);
           }
         });
   }

@@ -8,6 +8,12 @@ forbidden_error:
 unauthorized:
   code: ERR.AUTH0102
   message: You do not have permission to access this api!
+upload_file_error:
+  code: ERR.FILE0101
+  message: Upload file error!
+ai_service_error:
+  code: ERR.AI0101
+  message: AI service error!
 
 #Auth
 password_and_confirmation_password_is_not_match:

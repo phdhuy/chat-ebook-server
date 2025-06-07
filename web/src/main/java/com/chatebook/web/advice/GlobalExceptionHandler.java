@@ -1,12 +1,11 @@
 package com.chatebook.web.advice;
 
-import java.util.List;
-import java.util.Objects;
-
 import com.chatebook.common.common.CommonFunction;
 import com.chatebook.common.exception.*;
 import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.common.payload.response.ErrorResponse;
+import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,6 +65,20 @@ public class GlobalExceptionHandler {
     ErrorResponse errorResponse = CommonFunction.getValidationError(resource, fieldName, error);
     ResponseDataAPI responseDataAPI = ResponseDataAPI.error(errorResponse);
 
+    return new ResponseEntity<>(responseDataAPI, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(FileUploadException.class)
+  public ResponseEntity<ResponseDataAPI> fileUploadException(FileUploadException ex) {
+    ErrorResponse errorResponse = CommonFunction.getExceptionError(ex.getMessage());
+    ResponseDataAPI responseDataAPI = ResponseDataAPI.error(errorResponse);
+    return new ResponseEntity<>(responseDataAPI, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(AIServiceException.class)
+  public ResponseEntity<ResponseDataAPI> aiServiceException(AIServiceException ex) {
+    ErrorResponse errorResponse = CommonFunction.getExceptionError(ex.getMessage());
+    ResponseDataAPI responseDataAPI = ResponseDataAPI.error(errorResponse);
     return new ResponseEntity<>(responseDataAPI, HttpStatus.BAD_REQUEST);
   }
 }

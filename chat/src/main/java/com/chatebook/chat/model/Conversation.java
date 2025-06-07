@@ -29,7 +29,7 @@ public class Conversation extends AbstractEntity {
   @JoinColumn(name = "file_id")
   private File file;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
 }

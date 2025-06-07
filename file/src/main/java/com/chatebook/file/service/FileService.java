@@ -9,5 +9,7 @@ public interface FileService {
 
   File saveInfoUploadFile(MultipartFile multipartFile);
 
+  File saveFileByURL(String url);
+
   ResponseDataAPI getListFileByAdmin(Pageable pageable);
 }

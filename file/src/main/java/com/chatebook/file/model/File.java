@@ -2,7 +2,6 @@ package com.chatebook.file.model;
 
 import com.chatebook.common.model.AbstractEntity;
 import jakarta.persistence.*;
-
 import java.math.BigInteger;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -21,6 +20,8 @@ public class File extends AbstractEntity {
   @Id @GeneratedValue private UUID id;
 
   @Column private String secureUrl;
+
+  @Column private String fileName;
 
   @Column private String publicId;
 

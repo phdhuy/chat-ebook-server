@@ -8,6 +8,8 @@ public final class MessageConstant {
   public static final String UNAUTHORIZED = "unauthorized";
   public static final String FORBIDDEN_ERROR = "forbidden_error";
   public static final String INTERNAL_SERVER_ERROR = "internal_server_error";
+  public static final String UPLOAD_FILE_ERROR = "upload_file_error";
+  public static final String AI_SERVICE_ERROR = "ai_service_error";
 
   // Auth
   public static final String INCORRECT_EMAIL_OR_PASSWORD = "incorrect_email_or_password";
