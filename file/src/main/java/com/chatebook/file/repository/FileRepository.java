@@ -11,6 +11,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FileRepository extends JpaRepository<File, UUID> {
 
-  @Query(value = "SELECT f FROM files f")
-  Page<File> getListFileByAdmin(Pageable pageable);
+  @Query(
+      value =
+          "SELECT * FROM files f WHERE f.secure_url ILIKE CONCAT('%', :query, '%') OR f.file_name ILIKE CONCAT('%', :query, '%') OR f.public_id ILIKE CONCAT('%', :query, '%')",
+      nativeQuery = true)
+  Page<File> getListFileByAdmin(Pageable pageable, String query);
 }

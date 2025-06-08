@@ -14,7 +14,7 @@ public interface UserService {
 
   UserInfoResponse getMyInfo(UUID userId);
 
-  ResponseDataAPI getListUserByAdmin(Pageable pageable);
+  ResponseDataAPI getListUserByAdmin(Pageable pageable, String query);
 
   User createUserWithGoogle(String email, String avatarUrl, String username);
 

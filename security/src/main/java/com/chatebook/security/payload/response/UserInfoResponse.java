@@ -31,4 +31,6 @@ public class UserInfoResponse {
   private String username;
 
   private String avatarUrl;
+
+  private String role;
 }

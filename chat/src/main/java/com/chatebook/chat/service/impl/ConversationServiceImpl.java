@@ -165,8 +165,8 @@ public class ConversationServiceImpl implements ConversationService {
   }
 
   @Override
-  public ResponseDataAPI getListConversationByAdmin(Pageable pageable) {
-    Page<Conversation> conversations = conversationRepository.getListConversationByAdmin(pageable);
+  public ResponseDataAPI getListConversationByAdmin(Pageable pageable, String query) {
+    Page<Conversation> conversations = conversationRepository.getListConversationByAdmin(pageable, query);
 
     PageInfo pageInfo =
         new PageInfo(

@@ -67,8 +67,8 @@ public class FileServiceImpl implements FileService {
   }
 
   @Override
-  public ResponseDataAPI getListFileByAdmin(Pageable pageable) {
-    Page<File> files = fileRepository.getListFileByAdmin(pageable);
+  public ResponseDataAPI getListFileByAdmin(Pageable pageable, String query) {
+    Page<File> files = fileRepository.getListFileByAdmin(pageable, query);
 
     PageInfo pageInfo =
         new PageInfo(pageable.getPageNumber() + 1, files.getTotalPages(), files.getTotalElements());

@@ -11,5 +11,5 @@ public interface FileService {
 
   File saveFileByURL(String url);
 
-  ResponseDataAPI getListFileByAdmin(Pageable pageable);
+  ResponseDataAPI getListFileByAdmin(Pageable pageable, String query);
 }

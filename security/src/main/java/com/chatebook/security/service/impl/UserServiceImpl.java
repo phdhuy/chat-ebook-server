@@ -55,8 +55,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public ResponseDataAPI getListUserByAdmin(Pageable pageable) {
-    Page<User> users = userRepository.getListUser(pageable);
+  public ResponseDataAPI getListUserByAdmin(Pageable pageable, String query) {
+    Page<User> users = userRepository.getListUser(pageable, query);
 
     PageInfo pageInfo =
         new PageInfo(pageable.getPageNumber() + 1, users.getTotalPages(), users.getTotalElements());
