@@ -26,8 +26,9 @@ public class AdminConversationController {
       @RequestParam(name = "sort", defaultValue = "created_at") String sortBy,
       @RequestParam(name = "order", defaultValue = "asc") String order,
       @RequestParam(name = "page", defaultValue = "1") int page,
-      @RequestParam(name = "paging", defaultValue = "30") int paging) {
-    Pageable pageable = PagingUtils.makePageRequestWithCamelCase(sortBy, order, page, paging);
-    return conversationService.getListConversationByAdmin(pageable);
+      @RequestParam(name = "paging", defaultValue = "30") int paging,
+      @RequestParam(name = "query", required = false) String query) {
+    Pageable pageable = PagingUtils.makePageRequestWithSnakeCase(sortBy, order, page, paging);
+    return conversationService.getListConversationByAdmin(pageable, query);
   }
 }

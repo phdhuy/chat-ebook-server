@@ -67,18 +67,4 @@ public class GlobalExceptionHandler {
 
     return new ResponseEntity<>(responseDataAPI, HttpStatus.BAD_REQUEST);
   }
-
-  @ExceptionHandler(FileUploadException.class)
-  public ResponseEntity<ResponseDataAPI> fileUploadException(FileUploadException ex) {
-    ErrorResponse errorResponse = CommonFunction.getExceptionError(ex.getMessage());
-    ResponseDataAPI responseDataAPI = ResponseDataAPI.error(errorResponse);
-    return new ResponseEntity<>(responseDataAPI, HttpStatus.BAD_REQUEST);
-  }
-
-  @ExceptionHandler(AIServiceException.class)
-  public ResponseEntity<ResponseDataAPI> aiServiceException(AIServiceException ex) {
-    ErrorResponse errorResponse = CommonFunction.getExceptionError(ex.getMessage());
-    ResponseDataAPI responseDataAPI = ResponseDataAPI.error(errorResponse);
-    return new ResponseEntity<>(responseDataAPI, HttpStatus.BAD_REQUEST);
-  }
 }

@@ -55,7 +55,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
       response.setContentType("application/json");
       response.setCharacterEncoding("UTF-8");
-      ErrorResponse error = CommonFunction.getExceptionError(ex.getMessage());
+      ErrorResponse error = CommonFunction.getExceptionError(MessageConstant.FORBIDDEN_ERROR);
       ResponseDataAPI responseDataAPI = ResponseDataAPI.error(error);
       response
           .getWriter()
