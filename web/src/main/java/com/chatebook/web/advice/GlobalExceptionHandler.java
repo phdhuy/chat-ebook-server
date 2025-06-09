@@ -1,6 +1,7 @@
 package com.chatebook.web.advice;
 
 import com.chatebook.common.common.CommonFunction;
+import com.chatebook.common.constant.MessageConstant;
 import com.chatebook.common.exception.*;
 import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.common.payload.response.ErrorResponse;
@@ -9,6 +10,7 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -66,5 +68,12 @@ public class GlobalExceptionHandler {
     ResponseDataAPI responseDataAPI = ResponseDataAPI.error(errorResponse);
 
     return new ResponseEntity<>(responseDataAPI, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ResponseDataAPI> accessDeniedException(AccessDeniedException ex) {
+    ErrorResponse errorResponse = CommonFunction.getExceptionError(MessageConstant.FORBIDDEN_ERROR);
+    ResponseDataAPI responseDataAPI = ResponseDataAPI.error(errorResponse);
+    return new ResponseEntity<>(responseDataAPI, HttpStatus.FORBIDDEN);
   }
 }
