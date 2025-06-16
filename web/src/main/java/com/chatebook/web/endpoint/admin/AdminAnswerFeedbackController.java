@@ -20,7 +20,7 @@ public class AdminAnswerFeedbackController {
 
   private final AnswerFeedbackService answerFeedbackService;
 
-  @GetMapping("/feedback")
+  @GetMapping("/feedbacks")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseDataAPI getListAnswerFeedback(
       @RequestParam(name = "sort", defaultValue = "created_at") String sortBy,
