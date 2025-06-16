@@ -8,6 +8,7 @@ import com.chatebook.common.payload.response.ErrorResponse;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -75,5 +76,14 @@ public class GlobalExceptionHandler {
     ErrorResponse errorResponse = CommonFunction.getExceptionError(MessageConstant.FORBIDDEN_ERROR);
     ResponseDataAPI responseDataAPI = ResponseDataAPI.error(errorResponse);
     return new ResponseEntity<>(responseDataAPI, HttpStatus.FORBIDDEN);
+  }
+
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<ResponseDataAPI> handleDataIntegrityViolation(
+      DataIntegrityViolationException ex) {
+    ErrorResponse errorResponse =
+        CommonFunction.getExceptionError(MessageConstant.DATA_INTEGRITY_VIOLATION);
+    ResponseDataAPI responseDataAPI = ResponseDataAPI.error(errorResponse);
+    return new ResponseEntity<>(responseDataAPI, HttpStatus.BAD_REQUEST);
   }
 }

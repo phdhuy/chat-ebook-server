@@ -1,0 +1,13 @@
+package com.chatebook.feedback.model.enums;
+
+public enum ReasonFeedback {
+  TOO_SHORT,
+  NOT_ENOUGH_INFORMATION,
+  TOO_LONG,
+  POOR_FORMATTING,
+  MISSING_OR_INCORRECT_CITATION,
+  FABRICATED_INFORMATION,
+  DOESNT_ANSWER_THE_QUESTION,
+  WRONG_LANGUAGE,
+  OTHER
+}
