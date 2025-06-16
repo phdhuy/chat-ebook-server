@@ -10,6 +10,7 @@ public final class MessageConstant {
   public static final String INTERNAL_SERVER_ERROR = "internal_server_error";
   public static final String UPLOAD_FILE_ERROR = "upload_file_error";
   public static final String AI_SERVICE_ERROR = "ai_service_error";
+  public static final String DATA_INTEGRITY_VIOLATION = "data_integrity_violation";
 
   // Auth
   public static final String INCORRECT_EMAIL_OR_PASSWORD = "incorrect_email_or_password";
@@ -52,4 +53,7 @@ public final class MessageConstant {
 
   // Usage
   public static final String FROM_DATE_MUST_BE_BEFORE_TO_DATE = "from_date_must_be_before_to_date";
+
+  // Message
+  public static final String MESSAGE_NOT_FOUND = "message_not_found";
 }

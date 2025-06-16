@@ -14,6 +14,8 @@ import com.chatebook.chat.repository.MessageRepository;
 import com.chatebook.chat.service.ConversationService;
 import com.chatebook.chat.service.MessageService;
 import com.chatebook.common.config.RabbitMQConfig;
+import com.chatebook.common.constant.MessageConstant;
+import com.chatebook.common.exception.NotFoundException;
 import com.chatebook.common.payload.general.PageInfo;
 import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.common.utils.PagingUtils;
@@ -105,6 +107,13 @@ public class MessageServiceImpl implements MessageService {
     processAIResponse(aiResponseFuture, conversation, userId.toString());
 
     return response;
+  }
+
+  @Override
+  public Message findById(Long messageId) {
+    return messageRepository
+        .findById(messageId)
+        .orElseThrow(() -> new NotFoundException(MessageConstant.MESSAGE_NOT_FOUND));
   }
 
   @EventListener

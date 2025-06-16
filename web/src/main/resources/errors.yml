@@ -14,6 +14,9 @@ upload_file_error:
 ai_service_error:
   code: ERR.AI0101
   message: AI service error!
+data_integrity_violation:
+  code: ERR.DATA0101
+  message: Data integrity violation!
 
 #Auth
 password_and_confirmation_password_is_not_match:
@@ -63,3 +66,8 @@ mindmap_not_found:
 from_date_must_be_before_to_date:
   code: ERR.USAGE0101
   message: From date must be before to date!
+
+#Message
+message_not_found:
+  code: ERR.MSG0101
+  message: Message was not found!
