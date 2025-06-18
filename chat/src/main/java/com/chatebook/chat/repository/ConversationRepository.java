@@ -13,7 +13,7 @@ public interface ConversationRepository extends JpaRepository<Conversation, UUID
 
   @Query(
       value =
-          "SELECT c FROM conversations c LEFT JOIN FETCH c.file WHERE c.user.id = :userId and c.deletedAt is null ORDER BY c.createdAt DESC")
+          "SELECT c FROM conversations c LEFT JOIN FETCH c.file WHERE c.user.id = :userId and c.deletedAt is null ORDER BY COALESCE(c.isFavorite, FALSE) DESC, c.createdAt DESC")
   Page<Conversation> getMyConversations(Pageable pageable, UUID userId);
 
   @Query(

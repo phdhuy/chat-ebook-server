@@ -55,6 +55,7 @@ public class ConversationServiceImpl implements ConversationService {
     conversation.setFile(fileService.saveInfoUploadFile(file));
     conversation.setName(file.getOriginalFilename());
     conversation.setUser(userRepository.getReferenceById(userId));
+    conversation.setIsFavorite(false);
 
     conversationRepository.save(conversation);
 
@@ -166,7 +167,8 @@ public class ConversationServiceImpl implements ConversationService {
 
   @Override
   public ResponseDataAPI getListConversationByAdmin(Pageable pageable, String query) {
-    Page<Conversation> conversations = conversationRepository.getListConversationByAdmin(pageable, query);
+    Page<Conversation> conversations =
+        conversationRepository.getListConversationByAdmin(pageable, query);
 
     PageInfo pageInfo =
         new PageInfo(
@@ -181,5 +183,16 @@ public class ConversationServiceImpl implements ConversationService {
                     conversationMapper.toConversationInfoResponse(
                         conversation, fileMapper.toFileInfoResponse(conversation.getFile()))),
         pageInfo);
+  }
+
+  @Override
+  public void favoriteConversation(UUID userId, UUID conversationId) {
+    Conversation conversation = this.checkConversationOwnership(conversationId, userId);
+    if (conversation.getIsFavorite() != null) {
+      conversation.setIsFavorite(!conversation.getIsFavorite());
+    } else {
+      conversation.setIsFavorite(Boolean.TRUE);
+    }
+    conversationRepository.save(conversation);
   }
 }

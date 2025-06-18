@@ -3122,7 +3122,7 @@
   ],
   "refresh": "5s",
   "schemaVersion": 36,
-  "style": "dark",
+  "style": "light",
   "tags": [],
   "templating": {
     "list": [

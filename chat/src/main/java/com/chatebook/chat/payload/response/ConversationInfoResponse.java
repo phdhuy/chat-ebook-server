@@ -23,5 +23,7 @@ public class ConversationInfoResponse {
 
   private String name;
 
+  private Boolean isFavorite;
+
   private FileInfoResponse file;
 }
