@@ -47,6 +47,7 @@ public class AnswerFeedbackServiceImpl implements AnswerFeedbackService {
             .message(message)
             .reasonFeedback(ReasonFeedback.valueOf(answerFeedbackRequest.getReasonFeedback()))
             .additionalFeedback(answerFeedbackRequest.getAdditionalFeedback())
+            .isNegativeFeedback(answerFeedbackRequest.getIsNegativeFeedback())
             .build();
 
     answerFeedbackRepository.save(answerFeedback);

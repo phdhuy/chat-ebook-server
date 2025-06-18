@@ -19,7 +19,7 @@ public class AnswerFeedbackController {
 
   private final AnswerFeedbackService answerFeedbackService;
 
-  @PostMapping("/messages/{messageId}/feedback")
+  @PostMapping("/messages/{messageId}/feedbacks")
   @PreAuthorize("hasRole('USER')")
   public ResponseDataAPI createAnswerFeedback(
       @CurrentUser UserPrincipal userPrincipal,

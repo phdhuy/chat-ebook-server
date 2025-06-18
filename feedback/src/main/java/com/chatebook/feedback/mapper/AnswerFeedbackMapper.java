@@ -17,6 +17,7 @@ public interface AnswerFeedbackMapper {
   @Mapping(target = "createdAt", source = "answerFeedback.createdAt")
   @Mapping(target = "reasonFeedback", source = "answerFeedback.reasonFeedback")
   @Mapping(target = "additionalFeedback", source = "answerFeedback.additionalFeedback")
+  @Mapping(target = "isNegativeFeedback", source = "answerFeedback.isNegativeFeedback")
   AnswerFeedbackResponse toAnswerFeedbackResponse(
       AnswerFeedback answerFeedback, UserInfoResponse user, MessageInfoResponse message);
 }
