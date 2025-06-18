@@ -88,4 +88,12 @@ public class ConversationController {
         conversationService.updateInfoConversation(
             userPrincipal.getId(), conversationId, updateConversationRequest));
   }
+
+  @PutMapping("/{conversationId}/favorites")
+  @PreAuthorize("hasRole('USER')")
+  public ResponseDataAPI favoriteConversation(
+      @PathVariable UUID conversationId, @CurrentUser UserPrincipal userPrincipal) {
+    conversationService.favoriteConversation(userPrincipal.getId(), conversationId);
+    return ResponseDataAPI.successWithoutMetaAndData();
+  }
 }

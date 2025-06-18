@@ -4,7 +4,6 @@ import com.chatebook.common.model.AbstractEntity;
 import com.chatebook.file.model.File;
 import com.chatebook.security.model.User;
 import jakarta.persistence.*;
-
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,6 +23,8 @@ public class Conversation extends AbstractEntity {
   @Id @GeneratedValue private UUID id;
 
   @Column private String name;
+
+  @Column private Boolean isFavorite;
 
   @OneToOne
   @JoinColumn(name = "file_id")

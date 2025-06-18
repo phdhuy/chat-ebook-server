@@ -30,4 +30,6 @@ public interface ConversationService {
       UUID userId, UUID conversationId, UpdateConversationRequest updateConversationRequest);
 
   ResponseDataAPI getListConversationByAdmin(Pageable pageable, String query);
+
+  void favoriteConversation(UUID userId, UUID conversationId);
 }
