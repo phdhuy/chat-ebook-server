@@ -6,7 +6,6 @@ import com.chatebook.feedback.model.enums.ReasonFeedback;
 import com.chatebook.security.model.User;
 import jakarta.persistence.*;
 import java.util.UUID;
-
 import lombok.*;
 
 @Getter
@@ -25,6 +24,8 @@ public class AnswerFeedback extends AbstractEntity {
   private ReasonFeedback reasonFeedback;
 
   @Column private String additionalFeedback;
+
+  @Column private Boolean isNegativeFeedback;
 
   @OneToOne
   @JoinColumn(name = "message_id")

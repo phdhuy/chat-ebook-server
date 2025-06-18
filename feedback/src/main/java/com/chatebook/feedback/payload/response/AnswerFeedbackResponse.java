@@ -26,6 +26,8 @@ public class AnswerFeedbackResponse {
 
   private String additionalFeedback;
 
+  private Boolean isNegativeFeedback;
+
   private UserInfoResponse user;
 
   private MessageInfoResponse message;
