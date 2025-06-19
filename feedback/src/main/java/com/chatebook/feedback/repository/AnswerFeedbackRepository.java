@@ -12,7 +12,8 @@ import org.springframework.stereotype.Repository;
 public interface AnswerFeedbackRepository extends JpaRepository<AnswerFeedback, UUID> {
 
   @Query(
-          value = """
+      value =
+          """
       SELECT a
         FROM answer_feedbacks a
         left JOIN FETCH a.user u
@@ -23,12 +24,14 @@ public interface AnswerFeedbackRepository extends JpaRepository<AnswerFeedback, 
        WHERE LOWER(a.reasonFeedback)     LIKE LOWER(CONCAT('%',:query,'%'))
           OR LOWER(a.additionalFeedback) LIKE LOWER(CONCAT('%',:query,'%'))
       """,
-          countQuery = """
+      countQuery =
+          """
       SELECT COUNT(a)
         FROM answer_feedbacks a
        WHERE LOWER(a.reasonFeedback)     LIKE LOWER(CONCAT('%',:query,'%'))
           OR LOWER(a.additionalFeedback) LIKE LOWER(CONCAT('%',:query,'%'))
-      """
-  )
+      """)
   Page<AnswerFeedback> getListAnswerFeedbackByAdmin(Pageable pageable, String query);
+
+  boolean existsAnswerFeedbackByMessageId(Long messageId);
 }

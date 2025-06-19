@@ -71,3 +71,8 @@ from_date_must_be_before_to_date:
 message_not_found:
   code: ERR.MSG0101
   message: Message was not found!
+
+#AnswerFeedback
+answer_feedback_exists:
+  code: ERR.ANF0101
+  message: Answer feedback exists!

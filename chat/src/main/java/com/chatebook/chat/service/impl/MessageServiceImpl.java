@@ -10,9 +10,11 @@ import com.chatebook.chat.model.Message;
 import com.chatebook.chat.model.enums.SenderType;
 import com.chatebook.chat.payload.request.CreateMessageRequest;
 import com.chatebook.chat.payload.response.MessageInfoResponse;
+import com.chatebook.chat.projection.MessageProjection;
 import com.chatebook.chat.repository.MessageRepository;
 import com.chatebook.chat.service.ConversationService;
 import com.chatebook.chat.service.MessageService;
+import com.chatebook.chat.utils.MessageUtils;
 import com.chatebook.common.config.RabbitMQConfig;
 import com.chatebook.common.constant.MessageConstant;
 import com.chatebook.common.exception.NotFoundException;
@@ -20,10 +22,7 @@ import com.chatebook.common.payload.general.PageInfo;
 import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.common.utils.PagingUtils;
 import com.chatebook.common.utils.RabbitMQAdapter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +48,8 @@ public class MessageServiceImpl implements MessageService {
   private final RabbitMQAdapter rabbitMQAdapter;
 
   private final MessageMapper messageMapper;
+
+  private final MessageUtils messageUtils;
 
   @Override
   public MessageInfoResponse sendMessage(
@@ -77,13 +78,11 @@ public class MessageServiceImpl implements MessageService {
     Conversation conversation =
         conversationService.checkConversationOwnership(conversationId, userId);
 
-    Page<Message> page = messageRepository.findAllByConversationId(pageable, conversation.getId());
+    Page<MessageProjection> page =
+        messageRepository.findAllByConversationId(pageable, conversation.getId());
 
     List<MessageInfoResponse> data =
-        new java.util.ArrayList<>(
-            page.stream()
-                .map(msg -> messageMapper.toMessageInfoResponse(msg, conversationId))
-                .toList());
+        new java.util.ArrayList<>(page.stream().map(messageUtils::toMessageInfoResponse).toList());
 
     Collections.reverse(data);
 
@@ -150,7 +149,7 @@ public class MessageServiceImpl implements MessageService {
                 saveAndPublishMessageCitedExcerpt(conversation, aiResponse, queueRoutingKey))
         .exceptionally(
             throwable -> {
-              log.error("Failed to process AI response: {}", throwable.getMessage());
+              log.error("Failed to process query AI response: {}", throwable.getMessage());
               return null;
             });
   }
@@ -207,15 +206,12 @@ public class MessageServiceImpl implements MessageService {
     Conversation conversation =
         conversationService.checkConversationOwnership(conversationId, userId);
 
-    Page<Message> page =
+    Page<MessageProjection> page =
         messageRepository.findAllByConversationId(
             PagingUtils.makePageRequestWithCamelCase("id", "desc", 1, 3), conversation.getId());
 
     List<MessageInfoResponse> data =
-        new java.util.ArrayList<>(
-            page.stream()
-                .map(msg -> messageMapper.toMessageInfoResponse(msg, conversationId))
-                .toList());
+        new java.util.ArrayList<>(page.stream().map(messageUtils::toMessageInfoResponse).toList());
 
     Collections.reverse(data);
 
