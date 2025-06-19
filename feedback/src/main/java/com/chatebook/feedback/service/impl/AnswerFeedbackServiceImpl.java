@@ -3,6 +3,8 @@ package com.chatebook.feedback.service.impl;
 import com.chatebook.chat.mapper.MessageMapper;
 import com.chatebook.chat.model.Message;
 import com.chatebook.chat.service.MessageService;
+import com.chatebook.common.constant.MessageConstant;
+import com.chatebook.common.exception.BadRequestException;
 import com.chatebook.common.payload.general.PageInfo;
 import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.feedback.mapper.AnswerFeedbackMapper;
@@ -39,8 +41,12 @@ public class AnswerFeedbackServiceImpl implements AnswerFeedbackService {
   @Override
   public void createAnswerFeedback(
       UUID userId, Long messageId, AnswerFeedbackRequest answerFeedbackRequest) {
+    if (answerFeedbackRepository.existsAnswerFeedbackByMessageId(messageId)) {
+      throw new BadRequestException(MessageConstant.ANSWER_FEEDBACK_EXISTS);
+    }
     User user = userRepository.getReferenceById(userId);
     Message message = messageService.findById(messageId);
+
     AnswerFeedback answerFeedback =
         AnswerFeedback.builder()
             .user(user)

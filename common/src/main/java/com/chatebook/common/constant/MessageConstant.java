@@ -56,4 +56,7 @@ public final class MessageConstant {
 
   // Message
   public static final String MESSAGE_NOT_FOUND = "message_not_found";
+
+  // Answer feedback
+  public static final String ANSWER_FEEDBACK_EXISTS = "answer_feedback_exists";
 }

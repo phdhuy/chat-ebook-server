@@ -28,4 +28,6 @@ public class MessageInfoResponse {
   private UUID conversationId;
 
   List<CitedExcerptInfoResponse> citedExcerpts;
+
+  private Boolean isNegativeFeedback;
 }
