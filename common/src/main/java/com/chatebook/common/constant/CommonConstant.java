@@ -33,4 +33,6 @@ public final class CommonConstant {
   public static final String AI_BASE_URL = "http://rag-ai:5000";
 
   public static final long RABBITMQ_TTL = 172800000;
+
+  public static final long FILE_SIZE_10MB = 10L * 1024 * 1024;
 }
