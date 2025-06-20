@@ -1,11 +1,13 @@
 package com.chatebook.file.service.impl;
 
+import com.chatebook.common.constant.CommonConstant;
 import com.chatebook.common.payload.general.PageInfo;
 import com.chatebook.common.payload.general.ResponseDataAPI;
 import com.chatebook.file.mapper.FileMapper;
 import com.chatebook.file.model.File;
 import com.chatebook.file.repository.FileRepository;
 import com.chatebook.file.service.FileService;
+import com.chatebook.file.utils.FileBaseUtils;
 import com.chatebook.file.utils.FileUtils;
 import com.chatebook.file.utils.HandleFileCloudinaryUtils;
 import java.math.BigInteger;
@@ -29,12 +31,19 @@ public class FileServiceImpl implements FileService {
 
   private final FileUtils fileUtils;
 
+  private final FileBaseUtils fileBaseUtils;
+
   private final FileMapper fileMapper;
 
   @Override
   @Transactional
   public File saveInfoUploadFile(MultipartFile multipartFile) {
-    Map<String, String> result = handleFileCloudinaryUtils.uploadFile(multipartFile);
+    Map<String, String> result;
+    if (multipartFile.getSize() > CommonConstant.FILE_SIZE_10MB) {
+      result = fileBaseUtils.uploadFile(multipartFile);
+    } else {
+      result = handleFileCloudinaryUtils.uploadFile(multipartFile);
+    }
 
     return this.save(result);
   }
@@ -78,7 +87,6 @@ public class FileServiceImpl implements FileService {
 
   private File save(Map<String, String> result) {
     File file = new File();
-
     file.setSecureUrl(result.get("secure_url"));
     file.setPublicId(result.get("public_id"));
     file.setFormat(result.get("format"));
