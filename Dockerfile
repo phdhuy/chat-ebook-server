@@ -13,6 +13,7 @@ COPY ai/pom.xml ./ai/
 COPY mindmap/pom.xml ./mindmap/
 COPY subscription/pom.xml ./subscription/
 COPY feedback/pom.xml ./feedback/
+COPY dashboard/pom.xml ./dashboard/
 
 
 RUN mvn dependency:go-offline -B
