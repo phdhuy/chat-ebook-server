@@ -20,6 +20,7 @@ import com.chatebook.common.constant.MessageConstant;
 import com.chatebook.common.exception.NotFoundException;
 import com.chatebook.common.payload.general.PageInfo;
 import com.chatebook.common.payload.general.ResponseDataAPI;
+import com.chatebook.common.utils.EncryptionUtils;
 import com.chatebook.common.utils.PagingUtils;
 import com.chatebook.common.utils.RabbitMQAdapter;
 import java.util.*;
@@ -188,7 +189,7 @@ public class MessageServiceImpl implements MessageService {
       Conversation conversation, String content, SenderType senderType, String queueRoutingKey) {
     Message message = new Message();
 
-    message.setContent(content);
+    message.setContent(EncryptionUtils.encrypt(content));
     message.setSenderType(senderType);
     message.setConversation(conversation);
     message.setCitedExcerpts(List.of());
