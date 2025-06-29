@@ -159,7 +159,7 @@ public class MessageServiceImpl implements MessageService {
       Conversation conversation, QueryAIResponse content, String queueRoutingKey) {
     Message message = new Message();
 
-    message.setContent(content.getAnswer());
+    message.setContent(EncryptionUtils.encrypt(content.getAnswer()));
     message.setSenderType(SenderType.BOT);
     message.setConversation(conversation);
 
