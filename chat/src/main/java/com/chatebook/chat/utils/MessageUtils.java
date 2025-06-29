@@ -4,6 +4,7 @@ import com.chatebook.chat.payload.response.CitedExcerptInfoResponse;
 import com.chatebook.chat.payload.response.MessageInfoResponse;
 import com.chatebook.chat.projection.MessageProjection;
 import com.chatebook.common.exception.BadRequestException;
+import com.chatebook.common.utils.EncryptionUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +24,7 @@ public class MessageUtils {
     MessageInfoResponse response = new MessageInfoResponse();
     response.setId(messageProjection.getId());
     response.setCreatedAt(messageProjection.getCreatedAt());
-    response.setContent(messageProjection.getContent());
+    response.setContent(EncryptionUtils.decrypt(messageProjection.getContent()));
     response.setSenderType(messageProjection.getSenderType());
     response.setConversationId(messageProjection.getConversationId());
     response.setIsNegativeFeedback(messageProjection.getIsNegativeFeedback());
